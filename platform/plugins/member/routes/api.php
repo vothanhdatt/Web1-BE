@@ -22,4 +22,10 @@ Route::group([
         Route::put('change-password', 'MemberController@updatePassword');
     });
 
+    /**
+     * Custom API
+     * */ 
+    // Login
+    Route::post('member-login', 'CustomMemberController@login');
+
 });
