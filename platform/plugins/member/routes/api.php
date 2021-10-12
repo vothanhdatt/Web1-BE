@@ -31,5 +31,15 @@ Route::group([
     Route::post('member-register', 'CustomMemberController@register');
     // Active account
     Route::get('member-active-account', 'CustomMemberController@activeAccount');
+    // Sent Code Reset Password
+    Route::post('member-code-reset-password', 'CustomMemberController@sentCodeResetPassword');
+    // Reset Password
+    Route::post('member-reset-password', 'CustomMemberController@resetPassword');
 
+    /**
+     * API need Member Logged
+     * */ 
+    Route::group(['middleware' => ['auth:member-api']], function () {
+        Route::post('member-logout', 'CustomMemberController@logout');
+    });
 });

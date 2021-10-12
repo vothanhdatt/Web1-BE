@@ -11,6 +11,7 @@ use Botble\Member\Models\Member;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 
 class CustomMemberController extends Controller
@@ -49,6 +50,18 @@ class CustomMemberController extends Controller
             return response($this->result->setError($ex->getMessage()));
         }
     }
+
+    // Logout
+    function logout(Request $request)
+    {
+        $member_id = $request->user()->id;
+        // Clear all token
+        DB::table('oauth_access_tokens')
+            ->where('user_id', $member_id)
+            ->update(['revoked' => 1]);
+        return response($this->result->setData('Logout successful'));
+    }
+
 
     // Register
     public function register(Request $request)
@@ -140,6 +153,78 @@ class CustomMemberController extends Controller
         ];
         return view('emails.activeAccount', $data);
     }
+
+    // Send Code Reset Password
+    public function sentCodeResetPassword(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->input(), [
+                'email' => 'required|email|min:6'
+            ]);
+
+            if ($validator->fails()) {
+                return response($this->result->setError('Some field is not true !!'));
+            }
+            // Check Email Exist
+            $member = Member::where('email', $request->email)->first();
+            if (!$member) {
+                return response($this->result->setError('This Email is not exist'));
+            }
+            // Add Token
+            $codeReset = Str::random(8);
+            $member->email_verify_token = $codeReset;
+            $member->save();
+            // Sent mail
+            $to_name = "Admin";
+            $to_email = $member->email;
+            $data = array(
+                "fullName" => $member->first_name . " " . $member->last_name,
+                "code" => $codeReset
+            );
+            Mail::send('emails.sendCodeResetPassword', $data, function ($message) use ($to_name, $to_email) {
+                $message->to($to_email)->subject('Forget Password'); //send this mail with subject
+                $message->from($to_email, $to_name); //send from this mail
+            });
+            return response($this->result->setData("The code was send to email '" . $member->email . "'"));
+        } catch (Exception $ex) {
+            return response($this->result->setError($ex->getMessage()));
+        }
+    }
+
+    // Reset Password
+    function resetPassword(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'code'              => 'required|min:8',
+                'new_password'      => 'required|min:6|max:60',
+                'confirm_password'  => 'required|min:6|max:60',
+            ]);
+
+            if ($validator->fails()) {
+                return response($this->result->setError('Some field is not true'));
+            }
+            // Password and re password
+            if ($request->new_password != $request->confirm_password) {
+                return response($this->result->setError('New Password and Confirm Password is not same !!'));
+            }
+            // Get Code
+            $code = $request->code;
+            // Find Member
+            $member = Member::where('email_verify_token', $code)->first();
+            if (!$member) {
+                return response($this->result->setError('Wrong at your code !!'));
+            }
+            $member->email_verify_token = null;
+            $member->password = bcrypt($request->new_password);
+            $member->save();
+            return response($this->result->setData('Reset Password SuccessfulLy'));
+        } catch (Exception $ex) {
+            return response($this->result->setError($ex->getMessage()));
+        }
+    }
+
+
 
     // Get datetime Viet Nam Now
     private function getDatetimeVietNamNow()
