@@ -7,6 +7,7 @@ class CustomResult
     protected $isSuccess = false;
     protected $data = NULL;
     protected $error = false;
+    protected static $_instance;
     // Construct
     function __construct()
     {
@@ -19,20 +20,32 @@ class CustomResult
         $this->isSuccess = true;
         $this->data = $data;
         $this->error = false;
+        return $this->toResponse();
     }
     // Set Error
     public function setError($error){
         $this->isSuccess = false;
         $this->data = NULL;
         $this->error = $error;
+        return $this->toResponse();
     }
     // To response
-    public function toResponse(){
+    private function toResponse(){
         $response = [
             'isSuccess' => $this->isSuccess,
             'data' => $this->data,
             'error' => $this->error
         ];
         return $response;
+    }
+
+    // Get Instance
+    public static function getInstance()
+    {
+        if (self::$_instance !== null) {
+            return self::$_instance;
+        }
+        self::$_instance = new self();
+        return self::$_instance;
     }
 }

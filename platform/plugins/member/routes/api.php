@@ -27,5 +27,9 @@ Route::group([
      * */ 
     // Login
     Route::post('member-login', 'CustomMemberController@login');
+    // Register
+    Route::post('member-register', 'CustomMemberController@register');
+    // Active account
+    Route::get('member-active-account', 'CustomMemberController@activeAccount');
 
 });
