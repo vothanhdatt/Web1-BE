@@ -38,4 +38,15 @@ Route::group([
     Route::get('get-all-categories', 'CustomPostController@getAllCategories');
     //get profile by Categories
     Route::get('get-post-by-category', 'CustomPostController@getPostByCategory');
+    // Sent Code Reset Password
+    Route::post('member-code-reset-password', 'CustomMemberController@sentCodeResetPassword');
+    // Reset Password
+    Route::post('member-reset-password', 'CustomMemberController@resetPassword');
+
+    /**
+     * API need Member Logged
+     * */ 
+    Route::group(['middleware' => ['auth:member-api']], function () {
+        Route::post('member-logout', 'CustomMemberController@logout');
+    });
 });
