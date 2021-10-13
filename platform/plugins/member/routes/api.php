@@ -24,12 +24,18 @@ Route::group([
 
     /**
      * Custom API
-     * */ 
+     * */
     // Login
     Route::post('member-login', 'CustomMemberController@login');
     // Register
     Route::post('member-register', 'CustomMemberController@register');
     // Active account
     Route::get('member-active-account', 'CustomMemberController@activeAccount');
-
+    /**
+     * POST BY LAP API
+     * */
+    //get all Categories
+    Route::get('get-all-categories', 'CustomPostController@getAllCategories');
+    //get profile by Categories
+    Route::get('get-post-by-category', 'CustomPostController@getPostByCategory');
 });
