@@ -42,11 +42,16 @@ class CustomPostController extends Controller
     {
         $cateid = $request->category_id;
         try {
-            $posts  = Post::select('posts.*')
-                ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
-                ->join('categories', 'categories.id', '=', 'post_categories.category_id')
-                ->where('categories.id', '=', $cateid)
-                ->get();
+            if ($cateid == '*') {
+                $posts  = Post::select('posts.*')
+                    ->get();
+            } else {
+                $posts  = Post::select('posts.*')
+                    ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
+                    ->join('categories', 'categories.id', '=', 'post_categories.category_id')
+                    ->where('categories.id', '=', $cateid)
+                    ->get();
+            }
             return response($this->result->setData($posts));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
