@@ -76,8 +76,10 @@ class MemberController extends Controller
 
             $file = RvMedia::handleUpload($request->file('avatar'), 0, 'members');
             if (Arr::get($file, 'error') !== true) {
-                $user = $this->memberRepository->createOrUpdate(['avatar' => $file['data']->url],
-                    ['id' => $request->user()->getKey()]);
+                $user = $this->memberRepository->createOrUpdate(
+                    ['avatar' => $file['data']->url],
+                    ['id' => $request->user()->getKey()]
+                );
             }
 
             return $response
@@ -85,7 +87,6 @@ class MemberController extends Controller
                     'avatar' => $user->avatar_url,
                 ])
                 ->setMessage(__('Update avatar successfully!'));
-
         } catch (Exception $ex) {
             return $response
                 ->setError()
@@ -138,7 +139,6 @@ class MemberController extends Controller
             return $response
                 ->setData($user->toArray())
                 ->setMessage(__('Update profile successfully!'));
-
         } catch (Exception $ex) {
             return $response
                 ->setError()
