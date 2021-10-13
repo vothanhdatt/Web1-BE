@@ -31,6 +31,20 @@ Route::group([
     Route::post('member-register', 'CustomMemberController@register');
     // Active account
     Route::get('member-active-account', 'CustomMemberController@activeAccount');
+    /**
+     * POST BY LAP API
+     * */
+    //get all Categories
+    Route::get('get-all-categories', 'CustomPostController@getAllCategories');
+    //get profile by Categories
+    Route::get('get-post-by-category', 'CustomPostController@getPostByCategory');
+    //get feature post
+    Route::get('get-feature-post', 'CustomPostController@getFeaturePosts');
+
+
+
+
+
     // Sent Code Reset Password
     Route::post('member-code-reset-password', 'CustomMemberController@sentCodeResetPassword');
     // Reset Password
