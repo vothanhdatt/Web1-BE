@@ -54,6 +54,11 @@ Route::group([
      * API need Member Logged
      * */
     Route::group(['middleware' => ['auth:member-api']], function () {
+        // Logout
         Route::post('member-logout', 'CustomMemberController@logout');
+        // Get Profile
+        Route::get('member-profile', 'CustomMemberController@getProfile');
+        // Update Profile
+        Route::post('member-profile', 'CustomMemberController@updateMemberProfile');
     });
 });

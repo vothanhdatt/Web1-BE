@@ -78,7 +78,6 @@ class CustomMemberController extends Controller
                 'dob'              => 'nullable|date',
                 'phone'            => 'required|min:10|numeric',
             ]);
-
             if ($validator->fails()) {
                 return response($this->result->setError('Some field is not true !!'));
             }
@@ -102,7 +101,8 @@ class CustomMemberController extends Controller
                 'dob' => $request->dob,
                 'phone' => $request->phone,
             ]);
-            // Add Token
+            // Add Avatar Link and Token
+            $member->avatar = $this->get_url_sever() . '/storage/members/member.png';
             $token = Hash::make(Str::random(32));
             $member->email_verify_token = $token;
             $member->save();
@@ -224,6 +224,84 @@ class CustomMemberController extends Controller
         }
     }
 
+    // Get profile
+    public function getProfile(Request $request)
+    {
+        try {
+            $member = $request->user();
+            return response($this->result->setData($member));
+        } catch (Exception $ex) {
+            return response($this->result->setError($ex->getMessage()));
+        }
+    }
+
+    // Update member Avatar
+    private function updateMemberAvatar(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'avatar' => 'required|image|mimes:jpg,jpeg,png',
+            ]);
+            if ($validator->fails()) {
+                return false;
+            }
+            $member = $request->user();
+            $get_image = $request->file('avatar');
+            $img = explode('/', $member->avatar);
+            $img = end($img);
+            if ($img != "member.png") {
+                $destinationPath = 'upload/member/' . $img;
+                if (file_exists($destinationPath)) {
+                    unlink($destinationPath);
+                }
+            }
+            $avatar_name = 'member_' . $member->id . '.' . $get_image->getClientOriginalExtension();
+            $get_image->move('storage/members', $avatar_name);
+            $url = $this->get_url_sever() . '/storage/members/' . $avatar_name;
+            $member->avatar = $url;
+            $member->save();
+            return true;
+        } catch (Exception $ex) {
+            return false;
+        }
+    }
+
+    // Update Member Profile
+    public function updateMemberProfile(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->input(), [
+                'first_name'  => 'required|max:120|min:2',
+                'last_name'   => 'required|max:120|min:2',
+                'phone'       => 'required|max:15|min:8',
+                'dob'         => 'required|date',
+                'gender'      => 'required|integer|in:1,2',
+                'description' => 'nullable',
+            ]);
+
+            if ($validator->fails()) {
+                return response($this->result->setError('Some Field is not true !!'));
+            }
+            if ($request->avatar) {
+                $checkAvatar = $this->updateMemberAvatar($request);
+                if (!$checkAvatar) {
+                    return response($this->result->setError('Some thing wrong at the avatar !!'));
+                }
+            }
+            $member = $request->user();
+            // Update information
+            $member->first_name = $request->first_name;
+            $member->last_name = $request->last_name;
+            $member->phone = $request->phone;
+            $member->dob = $request->dob;
+            $member->gender = $request->gender;
+            $member->description = $request->description;
+            $member->save();
+            return response($this->result->setData($member));
+        } catch (Exception $ex) {
+            return response($this->result->setError($ex->getMessage()));
+        }
+    }
 
 
     // Get datetime Viet Nam Now
