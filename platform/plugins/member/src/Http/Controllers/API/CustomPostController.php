@@ -43,12 +43,16 @@ class CustomPostController extends Controller
         $cateid = $request->category_id;
         try {
             if ($cateid == '*') {
-                $posts  = Post::select('posts.*')
-                    ->get();
-            } else {
-                $posts  = Post::select('posts.*')
+                $posts  = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name')
+                    ->join('members', 'members.id', '=', 'posts.author_id')
                     ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
                     ->join('categories', 'categories.id', '=', 'post_categories.category_id')
+                    ->get();
+            } else {
+                $posts  = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name')
+                    ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
+                    ->join('categories', 'categories.id', '=', 'post_categories.category_id')
+                    ->join('members', 'members.id', '=', 'posts.author_id')
                     ->where('categories.id', '=', $cateid)
                     ->get();
             }
@@ -57,6 +61,21 @@ class CustomPostController extends Controller
             return response($this->result->setError($ex->getMessage()));
         }
     }
+
+    // Get top 10 Feature Post
+    function getFeaturePosts()
+    {
+        try {
+            $posts  = Post::select('posts.*')
+                ->orderByDesc('views')
+                ->limit(10)
+                ->get();
+            return response($this->result->setData($posts));
+        } catch (Exception $ex) {
+            return response($this->result->setError($ex->getMessage()));
+        }
+    }
+
     // Login
     public function login(Request $request)
     {
