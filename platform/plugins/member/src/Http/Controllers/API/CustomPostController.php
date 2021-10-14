@@ -52,6 +52,21 @@ class CustomPostController extends Controller
             return response($this->result->setError($ex->getMessage()));
         }
     }
+    //get 10 Post Hot
+    function get10PostHotByCategory(Request $request)
+    {
+        $cateid = $request->category_id;
+        try {
+            $posts  = Post::select('posts.10')
+                ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
+                ->join('categories', 'categories.id', '=', 'post_categories.category_id')
+                ->where('categories.id', '=', $cateid)
+                ->get();
+            return response($this->result->setData($posts));
+        } catch (Exception $ex) {
+            return response($this->result->setError($ex->getMessage()));
+        }
+    }
     // Login
     public function login(Request $request)
     {
