@@ -42,31 +42,40 @@ class CustomPostController extends Controller
     {
         $cateid = $request->category_id;
         try {
-            $posts  = Post::select('posts.*')
-                ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
-                ->join('categories', 'categories.id', '=', 'post_categories.category_id')
-                ->where('categories.id', '=', $cateid)
-                ->get();
+            if ($cateid == '*') {
+                $posts  = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name')
+                    ->join('members', 'members.id', '=', 'posts.author_id')
+                    ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
+                    ->join('categories', 'categories.id', '=', 'post_categories.category_id')
+                    ->get();
+            } else {
+                $posts  = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name')
+                    ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
+                    ->join('categories', 'categories.id', '=', 'post_categories.category_id')
+                    ->join('members', 'members.id', '=', 'posts.author_id')
+                    ->where('categories.id', '=', $cateid)
+                    ->get();
+            }
             return response($this->result->setData($posts));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
         }
     }
-    //get 10 Post Hot
-    function get10PostHotByCategory(Request $request)
+
+    // Get top 10 Feature Post
+    function getFeaturePosts()
     {
-        $cateid = $request->category_id;
         try {
-            $posts  = Post::select('posts.10')
-                ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
-                ->join('categories', 'categories.id', '=', 'post_categories.category_id')
-                ->where('categories.id', '=', $cateid)
+            $posts  = Post::select('posts.*')
+                ->orderByDesc('views')
+                ->limit(10)
                 ->get();
             return response($this->result->setData($posts));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
         }
     }
+
     // Login
     public function login(Request $request)
     {
