@@ -16,4 +16,17 @@ Route::group([
     Route::get('categories/filters', 'CategoryController@getFilters');
     Route::get('categories/{slug}', 'CategoryController@findBySlug');
 
+
+    /**
+     * API post management
+     */
+    
+    //Get Detail
+    Route::get('post-detail', 'CustomPostController@getPostById');
+
+    // Create post
+    Route::group(['middleware' => ['auth:member-api']], function () {
+        Route::post('create-post', 'CustomPostController@createPost');
+        Route::post('delete-post', 'CustomPostController@deletePost');
+    });
 });

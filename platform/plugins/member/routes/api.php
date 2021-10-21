@@ -61,4 +61,5 @@ Route::group([
         // Update Profile
         Route::post('member-profile', 'CustomMemberController@updateMemberProfile');
     });
+
 });
