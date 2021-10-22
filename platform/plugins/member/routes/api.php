@@ -54,7 +54,7 @@ Route::group([
      * API need Member Logged
      * */
     Route::group(['middleware' => ['auth:member-api']], function () {
-        // Logout
+        /** LOGOUT */
         Route::post('member-logout', 'CustomMemberController@logout');
         /**
          * Get Profile

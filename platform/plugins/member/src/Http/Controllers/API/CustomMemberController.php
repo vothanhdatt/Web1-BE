@@ -51,7 +51,7 @@ class CustomMemberController extends Controller
         }
     }
 
-    // Logout
+    /** LOGOUT */
     function logout(Request $request)
     {
         $member_id = $request->user()->id;
