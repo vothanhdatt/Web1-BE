@@ -58,7 +58,7 @@ Route::group([
         Route::post('member-logout', 'CustomMemberController@logout');
         // Get Profile
         Route::get('member-profile', 'CustomMemberController@getProfile');
-        // Update Profile
+        /** UPDATE MEMBER PROFILE */
         Route::post('member-profile', 'CustomMemberController@updateMemberProfile');
     });
 
