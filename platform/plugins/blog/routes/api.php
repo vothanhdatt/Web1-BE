@@ -20,7 +20,7 @@ Route::group([
     /**
      * API post management
      */
-    
+
     //Get Detail
     Route::get('post-detail', 'CustomPostController@getPostById');
 

@@ -95,7 +95,7 @@ class CustomPostController extends Controller
                 return response($this->result->setError("The post is not owned by the owner, cannot be deleted !"));
             }
             $postID = $post->id;
-            DB::table('post_categories')where('post_id', $postID)->delete();
+            DB::table('post_categories')->where('post_id', $postID)->delete();
 
             $post->delete();
             return response($this->result->setData("Delete successfull!"));
