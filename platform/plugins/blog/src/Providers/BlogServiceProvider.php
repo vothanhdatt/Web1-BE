@@ -110,9 +110,9 @@ class BlogServiceProvider extends ServiceProvider
         $this->app->booted(function () {
             $models = [Post::class, Category::class, Tag::class];
 
-            if (defined('LANGUAGE_MODULE_SCREEN_NAME')) {
-                Language::registerModule($models);
-            }
+            // if (defined('LANGUAGE_MODULE_SCREEN_NAME')) {
+            //     Language::registerModule($models);
+            // }
 
             SeoHelper::registerModule($models);
 
