@@ -191,7 +191,7 @@ class CustomMemberController extends Controller
         }
     }
 
-    // Reset Password
+    /** RESET PASSWORD */
     function resetPassword(Request $request)
     {
         try {
