@@ -62,7 +62,7 @@ class CustomPostController extends Controller
         }
     }
 
-    // Get top 10 Feature Post
+    // Get top 10 Feature Post Host (Danh)
     function getFeaturePosts()
     {
         try {
