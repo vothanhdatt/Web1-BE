@@ -25,7 +25,7 @@ Route::group([
     /**
      * Custom API
      * */
-    // Login
+    /** LOGIN */
     Route::post('member-login', 'CustomMemberController@login');
     // Register
     Route::post('member-register', 'CustomMemberController@register');
@@ -63,5 +63,4 @@ Route::group([
         // Update Profile
         Route::post('member-profile', 'CustomMemberController@updateMemberProfile');
     });
-
 });

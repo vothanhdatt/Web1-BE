@@ -23,7 +23,7 @@ class CustomMemberController extends Controller
         $this->result = CustomResult::getInstance();
     }
 
-    // Login
+    /** LOGIN */
     public function login(Request $request)
     {
         try {
