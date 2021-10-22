@@ -45,7 +45,7 @@ Route::group([
 
 
 
-    // Sent Code Reset Password
+    /** SEND CODE RESET PASSWORD */
     Route::post('member-code-reset-password', 'CustomMemberController@sentCodeResetPassword');
     /** RESET PASSWORD */
     Route::post('member-reset-password', 'CustomMemberController@resetPassword');

@@ -154,7 +154,7 @@ class CustomMemberController extends Controller
         return view('emails.activeAccount', $data);
     }
 
-    // Send Code Reset Password
+    /** SEND CODE RESET PASSWORD */
     public function sentCodeResetPassword(Request $request)
     {
         try {
