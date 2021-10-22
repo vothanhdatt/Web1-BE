@@ -29,7 +29,7 @@ Route::group([
     Route::post('member-login', 'CustomMemberController@login');
     /** MEMBER REGISTER */
     Route::post('member-register', 'CustomMemberController@register');
-    // Active account
+    /** ACTIVE ACCOUNT */
     Route::get('member-active-account', 'CustomMemberController@activeAccount');
     /**
      * POST BY LAP API

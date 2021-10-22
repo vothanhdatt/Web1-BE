@@ -127,7 +127,7 @@ class CustomMemberController extends Controller
         }
     }
 
-    // Active Account
+    /** ACTIVE ACCOUNT */
     public function activeAccount(Request $request)
     {
         // Get value in request
