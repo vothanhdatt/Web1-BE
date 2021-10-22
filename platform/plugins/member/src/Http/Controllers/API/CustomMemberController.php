@@ -224,7 +224,9 @@ class CustomMemberController extends Controller
         }
     }
 
-    // Get profile
+    /**
+     * Get Profile
+     * */
     public function getProfile(Request $request)
     {
         try {
