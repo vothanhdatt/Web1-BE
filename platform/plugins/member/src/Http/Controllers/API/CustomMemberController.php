@@ -63,7 +63,7 @@ class CustomMemberController extends Controller
     }
 
 
-    // Register
+    /** MEMBER REGISTER */
     public function register(Request $request)
     {
         try {
