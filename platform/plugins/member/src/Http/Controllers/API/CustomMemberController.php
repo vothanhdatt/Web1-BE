@@ -237,7 +237,7 @@ class CustomMemberController extends Controller
         }
     }
 
-    // Update member Avatar
+    /** UPDATE MEMBER AVATAR */
     private function updateMemberAvatar(Request $request)
     {
         try {
@@ -268,7 +268,7 @@ class CustomMemberController extends Controller
         }
     }
 
-    // Update Member Profile
+    /** UPDATE MEMBER PROFILE */
     public function updateMemberProfile(Request $request)
     {
         try {
