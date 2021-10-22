@@ -38,7 +38,7 @@ Route::group([
     Route::get('get-all-categories', 'CustomPostController@getAllCategories');
     //get profile by Categories
     Route::get('get-post-by-category', 'CustomPostController@getPostByCategory');
-    //get feature post
+    //get feature 10 post (Danh)
     Route::get('get-feature-post', 'CustomPostController@getFeaturePosts');
 
 
