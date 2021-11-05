@@ -25,11 +25,11 @@ Route::group([
     /**
      * Custom API
      * */
-    // Login
+    /** LOGIN */
     Route::post('member-login', 'CustomMemberController@login');
-    // Register
+    /** MEMBER REGISTER */
     Route::post('member-register', 'CustomMemberController@register');
-    // Active account
+    /** ACTIVE ACCOUNT */
     Route::get('member-active-account', 'CustomMemberController@activeAccount');
     /**
      * POST BY LAP API
@@ -38,28 +38,29 @@ Route::group([
     Route::get('get-all-categories', 'CustomPostController@getAllCategories');
     //get profile by Categories
     Route::get('get-post-by-category', 'CustomPostController@getPostByCategory');
-    //get feature post
+    //get feature 10 post (Danh)
     Route::get('get-feature-post', 'CustomPostController@getFeaturePosts');
 
 
 
 
 
-    // Sent Code Reset Password
+    /** SEND CODE RESET PASSWORD */
     Route::post('member-code-reset-password', 'CustomMemberController@sentCodeResetPassword');
-    // Reset Password
+    /** RESET PASSWORD */
     Route::post('member-reset-password', 'CustomMemberController@resetPassword');
 
     /**
      * API need Member Logged
      * */
     Route::group(['middleware' => ['auth:member-api']], function () {
-        // Logout
+        /** LOGOUT */
         Route::post('member-logout', 'CustomMemberController@logout');
-        // Get Profile
+        /**
+         * Get Profile
+         * */ 
         Route::get('member-profile', 'CustomMemberController@getProfile');
-        // Update Profile
+        /** UPDATE MEMBER PROFILE */
         Route::post('member-profile', 'CustomMemberController@updateMemberProfile');
     });
-
 });

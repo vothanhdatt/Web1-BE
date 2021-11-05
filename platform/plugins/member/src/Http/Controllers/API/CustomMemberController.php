@@ -23,7 +23,7 @@ class CustomMemberController extends Controller
         $this->result = CustomResult::getInstance();
     }
 
-    // Login
+    /** LOGIN */
     public function login(Request $request)
     {
         try {
@@ -51,7 +51,7 @@ class CustomMemberController extends Controller
         }
     }
 
-    // Logout
+    /** LOGOUT */
     function logout(Request $request)
     {
         $member_id = $request->user()->id;
@@ -63,7 +63,7 @@ class CustomMemberController extends Controller
     }
 
 
-    // Register
+    /** MEMBER REGISTER */
     public function register(Request $request)
     {
         try {
@@ -127,7 +127,7 @@ class CustomMemberController extends Controller
         }
     }
 
-    // Active Account
+    /** ACTIVE ACCOUNT */
     public function activeAccount(Request $request)
     {
         // Get value in request
@@ -154,7 +154,7 @@ class CustomMemberController extends Controller
         return view('emails.activeAccount', $data);
     }
 
-    // Send Code Reset Password
+    /** SEND CODE RESET PASSWORD */
     public function sentCodeResetPassword(Request $request)
     {
         try {
@@ -191,7 +191,7 @@ class CustomMemberController extends Controller
         }
     }
 
-    // Reset Password
+    /** RESET PASSWORD */
     function resetPassword(Request $request)
     {
         try {
@@ -224,7 +224,9 @@ class CustomMemberController extends Controller
         }
     }
 
-    // Get profile
+    /**
+     * Get Profile
+     * */
     public function getProfile(Request $request)
     {
         try {
@@ -235,7 +237,7 @@ class CustomMemberController extends Controller
         }
     }
 
-    // Update member Avatar
+    /** UPDATE MEMBER AVATAR */
     private function updateMemberAvatar(Request $request)
     {
         try {
@@ -266,7 +268,7 @@ class CustomMemberController extends Controller
         }
     }
 
-    // Update Member Profile
+    /** UPDATE MEMBER PROFILE */
     public function updateMemberProfile(Request $request)
     {
         try {
