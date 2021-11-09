@@ -16,4 +16,25 @@ Route::group([
     Route::get('categories/filters', 'CategoryController@getFilters');
     Route::get('categories/{slug}', 'CategoryController@findBySlug');
 
+    /**
+     * POST BY LAP API
+     * */
+    //get all Categories
+    Route::get('get-all-categories', 'CustomPostController@getAllCategories');
+    //get profile by Categories
+    Route::get('get-post-by-category', 'CustomPostController@getPostByCategory');
+
+
+    /**
+     * API post management
+     */
+
+    //Get Detail
+    Route::get('post-detail', 'CustomPostController@getPostById');
+
+    // Create post
+    Route::group(['middleware' => ['auth:member-api']], function () {
+        Route::post('create-post', 'CustomPostController@createPost');
+        Route::post('delete-post', 'CustomPostController@deletePost');
+    });
 });
