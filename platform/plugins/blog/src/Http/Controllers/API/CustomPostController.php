@@ -45,6 +45,9 @@ class CustomPostController extends Controller
     {
         $cateid = $request->category_id;
         try {
+            if ($cateid == null) {
+                return response($this->result->setError("Khong tim thay category"));
+            }
             if ($cateid == '*') {
                 $posts  = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name')
                     ->join('members', 'members.id', '=', 'posts.author_id')
