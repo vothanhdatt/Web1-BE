@@ -24,44 +24,6 @@ class CustomPostController extends Controller
         $this->result = CustomResult::getInstance();
     }
 
-    // Get all category
-    function getAllCategories()
-    {
-        try {
-            $categories = Category::where('status', 'published')
-                ->orderByDesc('is_featured')
-                ->get();
-            return response($this->result->setData($categories));
-        } catch (Exception $ex) {
-            return response($this->result->setError($ex->getMessage()));
-        }
-    }
-
-    //get profile by category
-    function getPostByCategory(Request $request)
-    {
-        $cateid = $request->category_id;
-        try {
-            if ($cateid == '*') {
-                $posts  = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name')
-                    ->join('members', 'members.id', '=', 'posts.author_id')
-                    ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
-                    ->join('categories', 'categories.id', '=', 'post_categories.category_id')
-                    ->get();
-            } else {
-                $posts  = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name')
-                    ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
-                    ->join('categories', 'categories.id', '=', 'post_categories.category_id')
-                    ->join('members', 'members.id', '=', 'posts.author_id')
-                    ->where('categories.id', '=', $cateid)
-                    ->get();
-            }
-            return response($this->result->setData($posts));
-        } catch (Exception $ex) {
-            return response($this->result->setError($ex->getMessage()));
-        }
-    }
-
     // Get top 10 Feature Post Host (Danh)
     function getFeaturePosts()
     {
