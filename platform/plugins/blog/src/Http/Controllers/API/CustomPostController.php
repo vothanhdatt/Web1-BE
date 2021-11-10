@@ -210,6 +210,7 @@ class CustomPostController extends Controller
     }
 
     /**
+     *
      * Update post
      */
     function updatePost(Request $request)
