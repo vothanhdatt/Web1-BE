@@ -77,6 +77,7 @@ class CustomPostController extends Controller
     }
 
     /**
+     *
      * Get all post of member
      */
     function getAllPost(Request $request)
