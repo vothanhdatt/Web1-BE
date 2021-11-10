@@ -24,7 +24,11 @@ Route::group([
      * Lấy tất cả category
      */
     Route::get('get-all-categories', 'CustomPostController@getAllCategories');
-    //get profile by Categories
+    /*
+     * get profile by Categories
+     * Lấy tất cả  bài viết theo category
+     * Lấy tất cả  bài viết 
+     */
     Route::get('get-post-by-category', 'CustomPostController@getPostByCategory');
 
 
