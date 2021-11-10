@@ -305,6 +305,35 @@ class CustomMemberController extends Controller
         }
     }
 
+    /** UPDATE MEMBER PASSWORD */
+    public function updateMemberPassword(Request $request){
+        try {
+            $validator = Validator::make($request->input(), [
+                'old_password'  => 'required|max:60|min:6',
+                'new_password'  => 'required|max:60|min:6',
+                'confirm_new_password'  => 'required|max:60|min:6'
+            ]);
+
+            if ($validator->fails()) {
+                return response($this->result->setError('Some Field is not true !!'));
+            }
+            if ($request->new_password != $request->confirm_new_password) {
+                return response($this->result->setError('Wrong at confirm password !!'));
+            }
+            $member = $request->user();
+            if (!password_verify($request->old_password, $member->password)){
+                return response($this->result->setError('Wrong at old password !!'));
+            }
+            // Update password
+            $member->password = bcrypt($request->new_password);
+            $member->save();
+            $this->logout($request);
+            return response($this->result->setData('Update Password Success, Please Login with new password !!'));
+        } catch (Exception $ex) {
+            return response($this->result->setError($ex->getMessage()));
+        }
+    }
+
 
     // Get datetime Viet Nam Now
     private function getDatetimeVietNamNow()
