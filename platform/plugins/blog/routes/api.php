@@ -32,9 +32,16 @@ Route::group([
     //Get Detail
     Route::get('post-detail', 'CustomPostController@getPostById');
 
-    // Create post
+
     Route::group(['middleware' => ['auth:member-api']], function () {
+
+        // Get all post
+        Route::get('get-all-post','CustomPostController@getAllPost');
+        // Create post
         Route::post('create-post', 'CustomPostController@createPost');
+        // Update post
+        Route::post('update-post','CustomPostController@updatePost');
+        // Delete post
         Route::post('delete-post', 'CustomPostController@deletePost');
     });
 });
