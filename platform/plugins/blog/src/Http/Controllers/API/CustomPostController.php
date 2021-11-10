@@ -28,7 +28,10 @@ class CustomPostController extends Controller
         $this->result = CustomResult::getInstance();
     }
 
-    // Get all category
+    /*
+     * Get all category
+     * Lấy tất cả category
+     */
     function getAllCategories()
     {
         try {
@@ -41,7 +44,11 @@ class CustomPostController extends Controller
         }
     }
 
-    //get profile by category
+    /*
+     * get profile by Categories
+     * Lấy tất cả  bài viết theo category
+     * Lấy tất cả  bài viết 
+     */
     function getPostByCategory(Request $request)
     {
         $cateid = $request->category_id;
@@ -85,7 +92,6 @@ class CustomPostController extends Controller
                 return response($this->result->setError("There are no posts !"));
             }
             return response($this->result->setData($post));
-
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
         }
@@ -210,6 +216,7 @@ class CustomPostController extends Controller
     }
 
     /**
+     *
      * Update post
      */
     function updatePost(Request $request)
@@ -253,8 +260,6 @@ class CustomPostController extends Controller
             if ($post->author_id != $member->id) {
                 return response($this->result->setError("Non-owned posts cannot be edited !!"));
             }
-
-
 
             // Check image
             $get_image = $request->file('image');
@@ -307,29 +312,8 @@ class CustomPostController extends Controller
 
                         // Create image by size
                         $this->createImageBySize($post, $get_image, $image_resize);
-
-//                    // Insert image into New Post
-//                    $image = $avatar_name = $post->id . '.' . $get_image->getClientOriginalExtension();
-//                    $image = 'news/' . $avatar_name;
-//                    // Save image 600 x 600
-//                    $image_resize = Image::make($get_image->getRealPath());
-//                    $image_resize->resize(600, 600);
-//                    $image_resize->save(public_path('storage/news/' . $avatar_name));
-//                    // Save image 150 x 150
-//                    $avatar_name = $post->id . '-150x150.' . $get_image->getClientOriginalExtension();
-//                    $image_resize->resize(150, 150);
-//                    $image_resize->save(public_path('storage/news/' . $avatar_name));
-//                    // Save image 540 x 360
-//                    $avatar_name = $post->id . '-540x360.' . $get_image->getClientOriginalExtension();
-//                    $image_resize->resize(540, 360);
-//                    $image_resize->save(public_path('storage/news/' . $avatar_name));
-//                    // Save image 565 x 375
-//                    $avatar_name = $post->id . '-565x375.' . $get_image->getClientOriginalExtension();
-//                    $image_resize->resize(565, 375);
-//                    $image_resize->save(public_path('storage/news/' . $avatar_name));
                     }
                 }
-//            $post->image = $image;
 
                 $post->name = $request->name;
                 $post->description = $request->description;
@@ -345,7 +329,6 @@ class CustomPostController extends Controller
                         'category_id' => $categoryId
                     ]);
                 }
-
             }
 
             return response($this->result->setData("Update successful!"));
