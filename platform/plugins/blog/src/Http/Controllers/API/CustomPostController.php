@@ -21,6 +21,7 @@ use Intervention\Image\ImageManagerStatic as Image;
 class CustomPostController extends Controller
 {
     private $result;
+
     // Construct
     function __construct()
     {
@@ -49,13 +50,13 @@ class CustomPostController extends Controller
                 return response($this->result->setError("Khong tim thay category"));
             }
             if ($cateid == '*') {
-                $posts  = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name',  'members.avatar as authorAvatar')
+                $posts = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name', 'members.avatar as authorAvatar')
                     ->join('members', 'members.id', '=', 'posts.author_id')
                     ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
                     ->join('categories', 'categories.id', '=', 'post_categories.category_id')
                     ->get();
             } else {
-                $posts  = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name',  'members.avatar as authorAvatar')
+                $posts = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name', 'members.avatar as authorAvatar')
                     ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
                     ->join('categories', 'categories.id', '=', 'post_categories.category_id')
                     ->join('members', 'members.id', '=', 'posts.author_id')
@@ -69,11 +70,15 @@ class CustomPostController extends Controller
     }
 
     /**
-     * Get all post
+     * Get all post of member
      */
-    function getAllPost(){
+    function getAllPost(Request $request)
+    {
         try {
-            $post = Post::select('posts.*')
+            $member = $request->user();
+            $post = Post::select('posts.*', 'members.first_name as authorFirstName', 'members.last_name as authorLastName', 'members.avatar as authorAvatar')
+                ->join('members', 'members.id', '=', 'posts.author_id')
+                ->where('members.id', $member->id)
                 ->orderByDesc('created_at')
                 ->get();
             if ($post == null) {
@@ -115,10 +120,10 @@ class CustomPostController extends Controller
         try {
             $member = $request->user();
             $validator = Validator::make($request->all(), [
-                'name'          => 'required|min:2|max:60',
-                'description'   => 'nullable|min:4|max:60',
-                'content'       => 'required',
-                'image'         => 'required|image|mimes:jpg,jpeg,png',
+                'name' => 'required|min:2|max:60',
+                'description' => 'nullable|min:4|max:60',
+                'content' => 'required',
+                'image' => 'required|image|mimes:jpg,jpeg,png',
             ]);
 
             if ($validator->fails()) {
@@ -150,8 +155,8 @@ class CustomPostController extends Controller
                 'content' => $request->content,
                 'status' => 'pending',
                 'author_id' => $member->id,
-                'author_type'   => "Botble\Member\Models\Member",
-                'format_type'   => 'default'
+                'author_type' => "Botble\Member\Models\Member",
+                'format_type' => 'default'
             ]);
             $get_image = $request->file('image');
             $avatar_name = $post->id . '.' . $get_image->getClientOriginalExtension();
@@ -210,16 +215,13 @@ class CustomPostController extends Controller
     function updatePost(Request $request)
     {
         try {
-            if ()
 
 
-            return response($this->result->setData("Update successful!"));
+                return response($this->result->setData("Update successful!"));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
         }
     }
-
-
 
 
     /**
@@ -274,6 +276,7 @@ class CustomPostController extends Controller
         date_default_timezone_set('Asia/Ho_Chi_Minh');
         return date('Y/m/d H:i:s', time());
     }
+
     //Get URL Sever
     function get_url_sever()
     {
