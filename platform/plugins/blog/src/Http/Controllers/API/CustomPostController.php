@@ -47,7 +47,7 @@ class CustomPostController extends Controller
     /*
      * get profile by Categories
      * Lấy tất cả  bài viết theo category
-     * Lấy tất cả  bài viết 
+     * Lấy tất cả  bài viết
      */
     function getPostByCategory(Request $request)
     {
@@ -119,6 +119,7 @@ class CustomPostController extends Controller
     }
 
     /**
+     *
      * Create post
      */
     function createPost(Request $request)
