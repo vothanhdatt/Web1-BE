@@ -44,10 +44,8 @@ Route::group([
 
         // Get all post
         Route::get('get-all-post', 'CustomPostController@getAllPost');
-        // Create post 
+        // Create post
         Route::post('create-post', 'CustomPostController@createPost');
-        // Update post
-        Route::post('update-post', 'CustomPostController@updatePost');
         // Update post
         Route::post('update-post','CustomPostController@updatePost');
         // Delete post.
