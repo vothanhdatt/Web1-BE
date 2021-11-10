@@ -28,7 +28,8 @@ Route::group([
     /**
      * API post management
      */
-
+    // Get all post
+    Route::get('get-all-post','CustomPostController@getAllPost');
     //Get Detail
     Route::get('post-detail', 'CustomPostController@getPostById');
 
