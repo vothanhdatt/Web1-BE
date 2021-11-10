@@ -91,7 +91,8 @@ class SlugServiceProvider extends ServiceProvider
                     return $this->slugable ? $this->slugable->id : '';
                 });
 
-                MacroableModels::addMacro($item,
+                MacroableModels::addMacro(
+                    $item,
                     'getUrlAttribute',
                     function () {
                         /**
@@ -109,7 +110,8 @@ class SlugServiceProvider extends ServiceProvider
                         }
 
                         return url($prefix ? $prefix . '/' . $this->slug : $this->slug);
-                    });
+                    }
+                );
             }
 
             $this->app->register(HookServiceProvider::class);

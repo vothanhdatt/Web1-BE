@@ -31,13 +31,7 @@ Route::group([
     Route::post('member-register', 'CustomMemberController@register');
     /** ACTIVE ACCOUNT */
     Route::get('member-active-account', 'CustomMemberController@activeAccount');
-    /**
-     * POST BY LAP API
-     * */
-    //get all Categories
-    Route::get('get-all-categories', 'CustomPostController@getAllCategories');
-    //get profile by Categories
-    Route::get('get-post-by-category', 'CustomPostController@getPostByCategory');
+
     //get feature 10 post (Danh)
     Route::get('get-feature-post', 'CustomPostController@getFeaturePosts');
 
@@ -56,11 +50,11 @@ Route::group([
     Route::group(['middleware' => ['auth:member-api']], function () {
         /** LOGOUT */
         Route::post('member-logout', 'CustomMemberController@logout');
-        /**
-         * Get Profile
-         * */ 
+        /** GET PROFILE */
         Route::get('member-profile', 'CustomMemberController@getProfile');
         /** UPDATE MEMBER PROFILE */
         Route::post('member-profile', 'CustomMemberController@updateMemberProfile');
+        /** UPDATE MEMBER PASSWORD */
+        Route::post('member-password', 'CustomMemberController@updateMemberPassword');
     });
 });
