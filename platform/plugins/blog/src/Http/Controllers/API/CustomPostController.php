@@ -339,7 +339,8 @@ class CustomPostController extends Controller
 
 
     /**
-     * Delete post
+     *
+     * Delete post.
      */
 
     function deletePost(Request $request)

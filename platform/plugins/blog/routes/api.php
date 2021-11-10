@@ -50,7 +50,7 @@ Route::group([
         Route::post('update-post', 'CustomPostController@updatePost');
         // Update post 
         Route::post('update-post','CustomPostController@updatePost');
-        // Delete post
+        // Delete post.
         Route::post('delete-post', 'CustomPostController@deletePost');
     });
 });
