@@ -28,7 +28,8 @@ class CustomPostController extends Controller
     function getFeaturePosts()
     {
         try {
-            $posts  = Post::select('posts.*')
+            $posts  = Post::select('posts.*', 'members.avatar as authorAvatar')
+                ->join('members', 'members.id', '=', 'posts.author_id')
                 ->orderByDesc('views')
                 ->limit(10)
                 ->get();
