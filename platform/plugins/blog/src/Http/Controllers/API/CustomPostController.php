@@ -69,6 +69,24 @@ class CustomPostController extends Controller
     }
 
     /**
+     * Get all post
+     */
+    function getAllPost(){
+        try {
+            $post = Post::select('posts.*')
+                ->orderByDesc('created_at')
+                ->get();
+            if ($post == null) {
+                return response($this->result->setError("There are no posts !"));
+            }
+            return response($this->result->setData($post));
+
+        } catch (Exception $ex) {
+            return response($this->result->setError($ex->getMessage()));
+        }
+    }
+
+    /**
      * Detail post
      */
     function getPostById(Request $request)
@@ -192,7 +210,7 @@ class CustomPostController extends Controller
     function updatePost(Request $request)
     {
         try {
-
+            if ()
 
 
             return response($this->result->setData("Update successful!"));
