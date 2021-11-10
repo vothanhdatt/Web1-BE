@@ -28,14 +28,18 @@ Route::group([
     /**
      * API post management
      */
-    // Get all post
-    Route::get('get-all-post','CustomPostController@getAllPost');
+
     //Get Detail
     Route::get('post-detail', 'CustomPostController@getPostById');
 
-    // Create post
+
     Route::group(['middleware' => ['auth:member-api']], function () {
+
+        // Get all post
+        Route::post('get-all-post','CustomPostController@getAllPost');
+        // Create post
         Route::post('create-post', 'CustomPostController@createPost');
+        // Delete post
         Route::post('delete-post', 'CustomPostController@deletePost');
     });
 });
