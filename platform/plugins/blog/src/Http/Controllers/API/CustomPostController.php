@@ -99,6 +99,7 @@ class CustomPostController extends Controller
     }
 
     /**
+     * 
      * Detail post
      */
     function getPostById(Request $request)
