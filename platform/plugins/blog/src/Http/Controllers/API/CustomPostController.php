@@ -21,13 +21,17 @@ use Intervention\Image\ImageManagerStatic as Image;
 class CustomPostController extends Controller
 {
     private $result;
+
     // Construct
     function __construct()
     {
         $this->result = CustomResult::getInstance();
     }
 
-    // Get all category
+    /*
+     * Get all category
+     * Lấy tất cả category
+     */
     function getAllCategories()
     {
         try {
@@ -40,7 +44,11 @@ class CustomPostController extends Controller
         }
     }
 
-    //get profile by category
+    /*
+     * get profile by Categories
+     * Lấy tất cả  bài viết theo category
+     * Lấy tất cả  bài viết
+     */
     function getPostByCategory(Request $request)
     {
         $cateid = $request->category_id;
@@ -49,13 +57,13 @@ class CustomPostController extends Controller
                 return response($this->result->setError("Khong tim thay category"));
             }
             if ($cateid == '*') {
-                $posts  = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name',  'members.avatar as authorAvatar')
+                $posts = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name', 'members.avatar as authorAvatar')
                     ->join('members', 'members.id', '=', 'posts.author_id')
                     ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
                     ->join('categories', 'categories.id', '=', 'post_categories.category_id')
                     ->get();
             } else {
-                $posts  = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name',  'members.avatar as authorAvatar')
+                $posts = Post::select('posts.*', 'members.first_name as members_first_name', 'members.last_name as members_last_name', 'categories.name as category_name', 'members.avatar as authorAvatar')
                     ->join('post_categories', 'post_categories.post_id', '=', 'posts.id')
                     ->join('categories', 'categories.id', '=', 'post_categories.category_id')
                     ->join('members', 'members.id', '=', 'posts.author_id')
@@ -69,6 +77,29 @@ class CustomPostController extends Controller
     }
 
     /**
+     *
+     * Get all post of member
+     */
+    function getAllPost(Request $request)
+    {
+        try {
+            $member = $request->user();
+            $post = Post::select('posts.*', 'members.first_name as authorFirstName', 'members.last_name as authorLastName', 'members.avatar as authorAvatar')
+                ->join('members', 'members.id', '=', 'posts.author_id')
+                ->where('members.id', $member->id)
+                ->orderByDesc('created_at')
+                ->get();
+            if ($post == null) {
+                return response($this->result->setError("There are no posts !"));
+            }
+            return response($this->result->setData($post));
+        } catch (Exception $ex) {
+            return response($this->result->setError($ex->getMessage()));
+        }
+    }
+
+    /**
+     * 
      * Detail post
      */
     function getPostById(Request $request)
@@ -90,6 +121,7 @@ class CustomPostController extends Controller
     }
 
     /**
+     *
      * Create post
      */
     function createPost(Request $request)
@@ -97,10 +129,10 @@ class CustomPostController extends Controller
         try {
             $member = $request->user();
             $validator = Validator::make($request->all(), [
-                'name'          => 'required|min:2|max:60',
-                'description'   => 'nullable|min:4|max:60',
-                'content'       => 'required',
-                'image'         => 'required|image|mimes:jpg,jpeg,png',
+                'name' => 'required|min:2|max:60',
+                'description' => 'nullable|min:4|max:60',
+                'content' => 'required',
+                'image' => 'required|image|mimes:jpg,jpeg,png',
             ]);
 
             if ($validator->fails()) {
@@ -132,8 +164,8 @@ class CustomPostController extends Controller
                 'content' => $request->content,
                 'status' => 'pending',
                 'author_id' => $member->id,
-                'author_type'   => "Botble\Member\Models\Member",
-                'format_type'   => 'default'
+                'author_type' => "Botble\Member\Models\Member",
+                'format_type' => 'default'
             ]);
             $get_image = $request->file('image');
             $avatar_name = $post->id . '.' . $get_image->getClientOriginalExtension();
@@ -187,13 +219,120 @@ class CustomPostController extends Controller
     }
 
     /**
+     *
      * Update post
      */
     function updatePost(Request $request)
     {
         try {
+            $member = $request->user();
+            $validator = Validator::make($request->all(), [
+                'postID' => 'required',
+                'name' => 'required|min:2|max:60',
+                'description' => 'nullable|min:4|max:60',
+                'content' => 'required',
+            ]);
 
+            if ($validator->fails()) {
+                return response($this->result->setError('Some field is not true !!'));
+            }
 
+            // Processing list category id
+            $listCategoryId = $request->categoriesId;
+            if (!$listCategoryId) {
+                return response($this->result->setError('Category not found !!'));
+            }
+
+            $listCategoryId = explode(',', $listCategoryId);
+            $newListCategoryId = [];
+            // Filter Category Id
+            foreach ($listCategoryId as $categoryId) {
+                if (is_numeric($categoryId) && $this->checkCategoryIdExist($categoryId)) {
+                    array_push($newListCategoryId, $categoryId);
+                }
+            }
+            if (count($newListCategoryId) == 0) {
+                return response($this->result->setError('Not sending in the correct format !!'));
+            }
+
+            // update post
+            $post = Post::where('id', '=', $request->postID)->first();
+            if ($post == null) {
+                return response($this->result->setError("No posts found!"));
+            }
+            if ($post->author_id != $member->id) {
+                return response($this->result->setError("Non-owned posts cannot be edited !!"));
+            }
+
+            // Check image
+            $get_image = $request->file('image');
+            $image = null;
+            if (!$get_image) {
+                $image = $post->image;
+            } else {
+                // Get file name
+                $get_name_image = $get_image->getClientOriginalName(); // Lay ten hinh (image.cbvcc)
+                $arr = explode('.', $get_name_image);
+                $check_file = end($arr);
+                if ($check_file) {
+                    if (
+                        strtolower($check_file) == 'jpg' ||
+                        strtolower($check_file) == 'jpeg' ||
+                        strtolower($check_file) == 'png'
+                    ) {
+                        // Delete File only image have value
+                        if ($post->image) {
+                            // Delete Old Image
+                            $imageLink = $post->image;
+                            $temp = explode(".", $imageLink);
+                            $endOfImage = $temp[count($temp) - 1];
+                            $image1 = $post->id . "." . $endOfImage;
+                            $image2 = $post->id . "-150x150." . $endOfImage;
+                            $image3 = $post->id . "-540x360." . $endOfImage;
+                            $image4 = $post->id . "-565x375." . $endOfImage;
+
+                            $arrImage = array($image1, $image2, $image3, $image4);
+
+                            for ($i = 0; $i < count($arrImage); $i++) {
+                                $destinationPath = 'storage/news/' . $arrImage[$i];
+                                // Delete Image
+                                if (file_exists($destinationPath)) {
+                                    unlink($destinationPath);
+                                }
+                            }
+                        }
+
+                        // Insert images
+                        $get_image = $request->file('image');
+                        $avatar_name = $post->id . '.' . $get_image->getClientOriginalExtension();
+                        $post->image = 'news/' . $avatar_name;
+                        $post->save();
+
+                        // Save image 600 x 600
+                        $image_resize = Image::make($get_image->getRealPath());
+                        $image_resize->resize(600, 600);
+                        $image_resize->save(public_path('storage/news/' . $avatar_name));
+
+                        // Create image by size
+                        $this->createImageBySize($post, $get_image, $image_resize);
+                    }
+                }
+
+                $post->name = $request->name;
+                $post->description = $request->description;
+                $post->content = $request->content;
+                $post->save();
+
+                DB::table('post_categories')->where('post_id', $post->id)->delete();
+
+                // Insert data into 'post_categories' table
+                foreach ($newListCategoryId as $categoryId) {
+                    DB::table('post_categories')->insert([
+                        'post_id' => $post->id,
+                        'category_id' => $categoryId
+                    ]);
+                }
+            }
 
             return response($this->result->setData("Update successful!"));
         } catch (Exception $ex) {
@@ -202,10 +341,9 @@ class CustomPostController extends Controller
     }
 
 
-
-
     /**
-     * Delete post
+     *
+     * Delete post.
      */
 
     function deletePost(Request $request)
@@ -256,6 +394,7 @@ class CustomPostController extends Controller
         date_default_timezone_set('Asia/Ho_Chi_Minh');
         return date('Y/m/d H:i:s', time());
     }
+
     //Get URL Sever
     function get_url_sever()
     {
