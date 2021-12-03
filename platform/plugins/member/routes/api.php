@@ -50,7 +50,7 @@ Route::group([
     Route::group(['middleware' => ['auth:member-api']], function () {
         /** LOGOUT */
         Route::post('member-logout', 'CustomMemberController@logout');
-        /** GET PROFILE */
+        /** GET MEMBER PROFILE */
         Route::get('member-profile', 'CustomMemberController@getProfile');
         /** UPDATE MEMBER PROFILE */
         Route::post('member-profile', 'CustomMemberController@updateMemberProfile');

@@ -24,7 +24,7 @@ class CustomPostController extends Controller
         $this->result = CustomResult::getInstance();
     }
 
-    // Get top 10 Feature Post Host (Danh)
+    // Get top 10 Feature Post Hot- (Danh)
     function getFeaturePosts()
     {
         try {

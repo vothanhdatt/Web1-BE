@@ -19,9 +19,16 @@ Route::group([
     /**
      * POST BY LAP API
      * */
-    //get all Categories
+    /*
+     * Get all category
+     * Lấy tất cả category
+     */
     Route::get('get-all-categories', 'CustomPostController@getAllCategories');
-    //get profile by Categories
+    /*
+     * get profile by Categories
+     * Lấy tất cả  bài viết theo category
+     * Lấy tất cả  bài viết
+     */
     Route::get('get-post-by-category', 'CustomPostController@getPostByCategory');
 
 
@@ -32,9 +39,16 @@ Route::group([
     //Get Detail
     Route::get('post-detail', 'CustomPostController@getPostById');
 
-    // Create post
+
     Route::group(['middleware' => ['auth:member-api']], function () {
+
+        // Get all post
+        Route::get('get-all-post', 'CustomPostController@getAllPost');
+        // Create post
         Route::post('create-post', 'CustomPostController@createPost');
+        // Update post
+        Route::post('update-post','CustomPostController@updatePost');
+        // Delete post.
         Route::post('delete-post', 'CustomPostController@deletePost');
     });
 });
