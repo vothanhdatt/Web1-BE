@@ -413,4 +413,52 @@ class CustomPostController extends Controller
         }
         return $scheme . '://' . $server_name . $port;
     }
+
+    /**
+     * WEB 2 START HERE
+     */
+    // Get list Related Post
+    function getRelatedPost(Request $request)
+    {
+        try {
+            $post_id = $request->post_id;
+            // Find the post
+            $post = Post::where("id", $post_id)
+                ->where('status', 'published')
+                ->first();
+            if (!$post) {
+                return response($this->result->setError('Post not found !!'));
+            }
+            // Get that post's category
+            $categoryList = DB::table('post_categories')
+                ->select("category_id")
+                ->where('post_id', $post->id)
+                ->get();
+
+            //Get Category list id
+            $categoryListId = [];
+            foreach ($categoryList as $cate) {
+                array_push($categoryListId, $cate->category_id);
+            }
+            $listPost = Post::select(
+                "posts.*",
+                "members.first_name as author_firstname",
+                "members.last_name as author_lastname",
+                "members.avatar as author_avatar"
+            )
+                ->join("post_categories", "post_categories.post_id", "posts.id")
+                ->join("members", "members.id", "posts.author_id")
+                ->whereIn("post_categories.category_id", $categoryListId)
+                ->where("posts.id", "!=", $post->id)
+                ->where('posts.status', 'published')
+                ->where('posts.author_type', 'like', '%Member%')
+                ->distinct()
+                ->orderByDesc("posts.id")
+                ->limit(4)
+                ->get();
+            return response($this->result->setData($listPost));
+        } catch (Exception $ex) {
+            return response($this->result->setError($ex->getMessage()));
+        }
+    }
 }
