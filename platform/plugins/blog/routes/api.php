@@ -51,4 +51,9 @@ Route::group([
         // Delete post.
         Route::post('delete-post', 'CustomPostController@deletePost');
     });
+
+    /**
+     * WEB 2 START HERE
+     */
+    Route::get('get-related-post', 'CustomPostController@getRelatedPost');
 });
