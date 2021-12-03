@@ -57,4 +57,10 @@ Route::group([
         /** UPDATE MEMBER PASSWORD */
         Route::post('member-password', 'CustomMemberController@updateMemberPassword');
     });
+
+    /**
+     * Web 2 Start here
+     */
+    /** Get top members Highlight */
+    Route::get('get-members-hightlight', 'CustomMemberController@getMembersHighlight');
 });

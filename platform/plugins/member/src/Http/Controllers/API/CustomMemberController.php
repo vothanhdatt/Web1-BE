@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Botble\Base\Http\Responses\CustomResult;
+use Botble\Blog\Models\Post;
 use Botble\Member\Models\Member;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -359,5 +360,31 @@ class CustomMemberController extends Controller
             $scheme = 'http';
         }
         return $scheme . '://' . $server_name . $port;
+    }
+
+    /** Web 2 Start Here */
+    function getMembersHighlight()
+    {
+        try{
+            $author_ids = Post::select(DB::raw('`author_id`,COUNT(`author_id`) as posts_number'))
+            ->where('author_type', 'like', '%Member%')
+            ->where('status', 'published')
+            ->groupBy('author_id')
+            ->orderByDesc(DB::raw('COUNT(`author_id`)'))
+            ->limit(5)
+            ->get();
+        $topMembers = array();
+        foreach ($author_ids as $author_id) {
+            $user_info = Member::where('id', $author_id->author_id)->first();
+            if ($user_info) {
+                $user_info['posts_number'] = $author_id->posts_number;
+                array_push($topMembers, $user_info);
+            }
+        }
+
+            return response($this->result->setData($topMembers));
+        }catch(Exception $ex){
+            return response($this->result->setError($ex->getMessage()));
+        }
     }
 }
