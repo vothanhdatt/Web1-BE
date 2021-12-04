@@ -30,7 +30,7 @@ class CustomPostController extends Controller
 
     /*
      * Get all category
-     * Lấy tất cả category
+     * Lấy tất cả danh mục
      */
     function getAllCategories()
     {
@@ -46,7 +46,7 @@ class CustomPostController extends Controller
 
     /*
      * get profile by Categories
-     * Lấy tất cả  bài viết theo category
+     * Lấy tất cả  bài viết theo danh mục
      * Lấy tất cả  bài viết
      */
     function getPostByCategory(Request $request)
@@ -99,8 +99,9 @@ class CustomPostController extends Controller
     }
 
     /**
-     * 
+     *
      * Detail post
+     * Chi tiết bài viết
      */
     function getPostById(Request $request)
     {
@@ -422,6 +423,9 @@ class CustomPostController extends Controller
     {
         try {
             $post_id = $request->post_id;
+            if(!is_integer($post_id)){
+                return response($this->result->setError('Wrong at Post Id'));
+            }
             // Find the post
             $post = Post::where("id", $post_id)
                 ->where('status', 'published')
