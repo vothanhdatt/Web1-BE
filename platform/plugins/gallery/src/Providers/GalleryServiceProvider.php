@@ -72,9 +72,9 @@ class GalleryServiceProvider extends ServiceProvider
         });
 
         $this->app->booted(function () {
-            if (defined('LANGUAGE_MODULE_SCREEN_NAME')) {
-                Language::registerModule([Gallery::class]);
-            }
+            // if (defined('LANGUAGE_MODULE_SCREEN_NAME')) {
+            //     Language::registerModule([Gallery::class]);
+            // }
 
             SeoHelper::registerModule([Gallery::class]);
 
