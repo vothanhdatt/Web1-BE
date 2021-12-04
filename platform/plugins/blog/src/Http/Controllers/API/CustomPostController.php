@@ -30,7 +30,7 @@ class CustomPostController extends Controller
 
     /*
      * Get all category
-     * Lấy tất cả category
+     * Lấy tất cả danh mục
      */
     function getAllCategories()
     {
@@ -99,7 +99,7 @@ class CustomPostController extends Controller
     }
 
     /**
-     * 
+     *
      * Detail post
      */
     function getPostById(Request $request)
