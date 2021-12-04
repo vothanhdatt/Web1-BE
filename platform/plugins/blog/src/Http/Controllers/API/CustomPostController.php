@@ -101,6 +101,7 @@ class CustomPostController extends Controller
     /**
      *
      * Detail post
+     * Chi tiết bài viết
      */
     function getPostById(Request $request)
     {
