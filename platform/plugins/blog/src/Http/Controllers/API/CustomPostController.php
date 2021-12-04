@@ -422,6 +422,9 @@ class CustomPostController extends Controller
     {
         try {
             $post_id = $request->post_id;
+            if(!is_integer($post_id)){
+                return response($this->result->setError('Wrong at Post Id'));
+            }
             // Find the post
             $post = Post::where("id", $post_id)
                 ->where('status', 'published')
