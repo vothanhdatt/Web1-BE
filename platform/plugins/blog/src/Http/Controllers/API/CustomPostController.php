@@ -46,7 +46,7 @@ class CustomPostController extends Controller
 
     /*
      * get profile by Categories
-     * Lấy tất cả  bài viết theo category
+     * Lấy tất cả  bài viết theo danh mục
      * Lấy tất cả  bài viết
      */
     function getPostByCategory(Request $request)
