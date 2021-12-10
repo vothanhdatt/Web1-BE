@@ -30,7 +30,7 @@ class CustomPostController extends Controller
 
     /*
      * Get all category
-     * Lấy tất cả category
+     * Lấy tất cả danh mục
      */
     function getAllCategories()
     {
@@ -46,7 +46,7 @@ class CustomPostController extends Controller
 
     /*
      * get profile by Categories
-     * Lấy tất cả  bài viết theo category
+     * Lấy tất cả  bài viết theo danh mục
      * Lấy tất cả  bài viết
      */
     function getPostByCategory(Request $request)
@@ -99,21 +99,38 @@ class CustomPostController extends Controller
     }
 
     /**
-     * 
+     *
      * Detail post
+     * Chi tiết bài viết
      */
     function getPostById(Request $request)
     {
         try {
+            $postId = $request->postID;
+            // Get Post Information
             $post = Post::select('posts.*', 'members.first_name as authorFirstName', 'members.last_name as authorLastName', 'members.avatar as authorAvatar')
                 ->join('members', 'members.id', '=', 'posts.author_id')
-                ->where('posts.id', $request->postID)->first();
+                ->where('posts.id', $postId)->first();
             if ($post == null) {
                 return response($this->result->setError("There are no posts !"));
             }
             if ($post->status != "published") {
                 return response($this->result->setError("This post has not been approved !"));
             }
+            // Update views of post
+            $post->views += 1;
+            $post->save();
+            // Get Comment And rating of post
+            $post['commentTotal'] = DB::table('post_comment_ratings')->where([
+                ['post_id', $postId],
+            ])->count();
+            // Get total average star
+            $post['starAverage'] = round(DB::table('post_comment_ratings')->where([
+                ['post_id', $postId],
+                ['author_id', '!=', $post->author_id]
+            ])->avg('star_rating'), 2);
+            $post['starAverage'] = $post['starAverage'] ? $post['starAverage'] . "/5" : "0/5";
+
             return response($this->result->setData($post));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
@@ -412,5 +429,113 @@ class CustomPostController extends Controller
             $scheme = 'http';
         }
         return $scheme . '://' . $server_name . $port;
+    }
+
+    /**
+     * WEB 2 START HERE
+     */
+    // Get list Related Post
+    function getRelatedPost(Request $request)
+    {
+        try {
+            $post_id = $request->post_id;
+            if (!is_integer($post_id)) {
+                return response($this->result->setError('Wrong at Post Id'));
+            }
+            // Find the post
+            $post = Post::where("id", $post_id)
+                ->where('status', 'published')
+                ->first();
+            if (!$post) {
+                return response($this->result->setError('Post not found !!'));
+            }
+            // Get that post's category
+            $categoryList = DB::table('post_categories')
+                ->select("category_id")
+                ->where('post_id', $post->id)
+                ->get();
+
+            //Get Category list id
+            $categoryListId = [];
+            foreach ($categoryList as $cate) {
+                array_push($categoryListId, $cate->category_id);
+            }
+            $listPost = Post::select(
+                "posts.*",
+                "members.first_name as author_firstname",
+                "members.last_name as author_lastname",
+                "members.avatar as author_avatar"
+            )
+                ->join("post_categories", "post_categories.post_id", "posts.id")
+                ->join("members", "members.id", "posts.author_id")
+                ->whereIn("post_categories.category_id", $categoryListId)
+                ->where("posts.id", "!=", $post->id)
+                ->where('posts.status', 'published')
+                ->where('posts.author_type', 'like', '%Member%')
+                ->distinct()
+                ->orderByDesc("posts.id")
+                ->limit(4)
+                ->get();
+            return response($this->result->setData($listPost));
+        } catch (Exception $ex) {
+            return response($this->result->setError($ex->getMessage()));
+        }
+    }
+    // Filter Post 
+    function filterListPostByMember(Request $request)
+    {
+        try {
+            // Check request
+            $validator = Validator::make($request->all(), [
+                'filter_by' => 'required|in:date,name,created_at',
+                'order_by' => 'required|in:DESC,ASC',
+            ]);
+            if ($validator->fails()) {
+                return response($this->result->setError('Some Field is not true !!'));
+            }
+            $posts = [];
+            // Processing date separately and name,created_at separately
+            // Processing filter by name,created_at
+            if ($request->filter_by != 'date') {
+                $posts = Post::where([
+                    ['author_id', $request->user()->id],
+                    ['author_type', 'like', '%member%']
+                ])
+                    ->orderBy($request->filter_by, $request->order_by)
+                    ->get();
+            }
+            // Processing filter by date
+            else {
+                $date = $request->time;
+                // Check time request 
+                if ((bool)preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/', $date)) {
+                    $posts = Post::where([
+                        ['author_id', $request->user()->id],
+                        ['author_type', 'like', '%member%'],
+                    ])
+                        ->whereDate('created_at', '>=', $date)
+                        ->orderBy('created_at', $request->order_by)
+                        ->get();
+                } else {
+                    return response($this->result->setError('The time is not datetime formate, Please send with format yyyy-mm-dd'));
+                }
+            }
+            foreach ($posts as $post) {
+                $postId = $post->id;
+                // Get Comment And rating of post
+                $post['commentTotal'] = DB::table('post_comment_ratings')->where([
+                    ['post_id', $postId],
+                ])->count();
+                // Get total average star
+                $post['starAverage'] = round(DB::table('post_comment_ratings')->where([
+                    ['post_id', $postId],
+                    ['author_id', '!=', $post->author_id]
+                ])->avg('star_rating'), 2);
+                $post['starAverage'] = $post['starAverage'] ? $post['starAverage'] . "/5" : "0/5";
+            }
+            return response($this->result->setData($posts));
+        } catch (Exception $ex) {
+            return response($this->result->serError($ex));
+        }
     }
 }
