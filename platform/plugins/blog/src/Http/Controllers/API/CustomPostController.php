@@ -439,7 +439,7 @@ class CustomPostController extends Controller
     {
         try {
             $post_id = $request->post_id;
-            if(!is_integer($post_id)){
+            if (!is_integer($post_id)) {
                 return response($this->result->setError('Wrong at Post Id'));
             }
             // Find the post
@@ -479,6 +479,66 @@ class CustomPostController extends Controller
             return response($this->result->setData($listPost));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
+        }
+    }
+    // Filter Post 
+    function filterListPostByMember(Request $request)
+    {
+        try {
+            // Check request
+            $validator = Validator::make($request->all(), [
+                'filter_by' => 'required|in:date,name,created_at',
+                'order_by' => 'required|in:DESC,ASC',
+            ]);
+            if ($validator->fails()) {
+                return response($this->result->setError('Some Field is not true !!'));
+            }
+            $posts = [];
+            // Processing date separately and name,created_at separately
+            // Processing filter by name,created_at
+            if ($request->filter_by != 'date') {
+                $posts = Post::where([
+                    ['author_id', $request->user()->id],
+                    ['author_type', 'like', '%member%']
+                ])
+                    ->orderBy($request->filter_by, $request->order_by)
+                    ->get();
+            }
+            // Processing filter by date
+            else {
+                $date = $request->time;
+                // Check time request 
+                if ((bool)preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/', $date)) {
+                    $posts = Post::where([
+                        ['author_id', $request->user()->id],
+                        ['author_type', 'like', '%member%'],
+                    ])
+                        ->whereDate('created_at', '>=', $date)
+                        ->orderBy('created_at', $request->order_by)
+                        ->get();
+                } else {
+                    return response($this->result->setError('The time is not datetime formate, Please send with format yyyy-mm-dd'));
+                }
+            }
+            foreach ($posts as $post) {
+                $postId = $post->id;
+                // Get Comment And rating of post
+                $post['commentTotal'] = DB::table('post_comment_ratings')->where([
+                    ['post_id', $postId],
+                ])->count();
+                // Get total average star
+                $post['starAverage'] = round(DB::table('post_comment_ratings')->where([
+                    ['post_id', $postId],
+                    ['author_id', '!=', $post->author_id]
+                ])->avg('star_rating'), 2);
+                $post['starAverage'] = $post['starAverage'] ? $post['starAverage'] . "/5" : "0/5";
+                if(isset($post['content'])){
+                    unset($post['content']);
+                }
+            }
+            return response($this->result->setData($posts));
+        } catch (Exception $ex) {
+            return response($this->result->serError($ex));
         }
     }
 }

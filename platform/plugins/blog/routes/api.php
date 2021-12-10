@@ -47,7 +47,7 @@ Route::group([
         // Create post
         Route::post('create-post', 'CustomPostController@createPost');
         // Update post
-        Route::post('update-post','CustomPostController@updatePost');
+        Route::post('update-post', 'CustomPostController@updatePost');
         // Delete post.
         Route::post('delete-post', 'CustomPostController@deletePost');
     });
@@ -55,5 +55,11 @@ Route::group([
     /**
      * WEB 2 START HERE
      */
+    // Related post
     Route::get('get-related-post', 'CustomPostController@getRelatedPost');
+    // Api need Login
+    Route::group(['middleware' => ['auth:member-api']], function () {
+        // List Post By Member (With Filter)
+        Route::get('get-list-post-member-filter', 'CustomPostController@filterListPostByMember');
+    });
 });
