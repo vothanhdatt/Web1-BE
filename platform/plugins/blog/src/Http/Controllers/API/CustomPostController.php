@@ -532,9 +532,6 @@ class CustomPostController extends Controller
                     ['author_id', '!=', $post->author_id]
                 ])->avg('star_rating'), 2);
                 $post['starAverage'] = $post['starAverage'] ? $post['starAverage'] . "/5" : "0/5";
-                if(isset($post['content'])){
-                    unset($post['content']);
-                }
             }
             return response($this->result->setData($posts));
         } catch (Exception $ex) {
