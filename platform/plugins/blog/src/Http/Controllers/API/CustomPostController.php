@@ -105,15 +105,31 @@ class CustomPostController extends Controller
     function getPostById(Request $request)
     {
         try {
+            $postId = $request->postID;
+            // Get Post Information
             $post = Post::select('posts.*', 'members.first_name as authorFirstName', 'members.last_name as authorLastName', 'members.avatar as authorAvatar')
                 ->join('members', 'members.id', '=', 'posts.author_id')
-                ->where('posts.id', $request->postID)->first();
+                ->where('posts.id', $postId)->first();
             if ($post == null) {
                 return response($this->result->setError("There are no posts !"));
             }
             if ($post->status != "published") {
                 return response($this->result->setError("This post has not been approved !"));
             }
+            // Update views of post
+            $post->views += 1;
+            $post->save();
+            // Get Comment And rating of post
+            $post['commentTotal'] = DB::table('post_comment_ratings')->where([
+                ['post_id', $postId],
+            ])->count();
+            // Get total average star
+            $post['starAverage'] = round(DB::table('post_comment_ratings')->where([
+                ['post_id', $postId],
+                ['author_id', '!=', $post->author_id]
+            ])->avg('star_rating'), 2);
+            $post['starAverage'] = $post['starAverage'] ? $post['starAverage'] . "/5" : "0/5";
+
             return response($this->result->setData($post));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
