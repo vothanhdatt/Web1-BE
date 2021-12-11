@@ -43,7 +43,7 @@ Route::group([
     Route::group(['middleware' => ['auth:member-api']], function () {
 
         // Get all post
-        Route::get('get-all-post', 'CustomPostController@getAllPost');
+        Route::get('get-list-post-member', 'CustomPostController@getListPostMember');
         // Create post
         Route::post('create-post', 'CustomPostController@createPost');
         // Update post
