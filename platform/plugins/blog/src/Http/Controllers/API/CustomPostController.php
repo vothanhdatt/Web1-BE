@@ -539,7 +539,7 @@ class CustomPostController extends Controller
             }
             return response($this->result->setData($posts));
         } catch (Exception $ex) {
-            return response($this->result->serError($ex));
+            return response($this->result->setError($ex->getMessage()));
         }
     }
 
@@ -566,7 +566,41 @@ class CustomPostController extends Controller
                 ->get();
                 return response($this->result->setData($comments));
         } catch (Exception $ex) {
-            return response($this->result->serError($ex));
+            return response($this->result->setError($ex->getMessage()));
+        }
+     }
+     // createRatingPost
+     function createRatingPost(Request $request)
+     {
+        try {
+            $validator = Validator::make($request->all(), [
+                'text_content'      => 'required|min:2',
+                'star_rating'       => 'required|integer|min:1|max:5',
+                'post_id'           => 'required|integer|min:1',
+            ]);
+
+            if ($validator->fails()) {
+                return response($this->result->setError("Some field not true!"));
+            }
+            $post = Post::where("id", $request->post_id)->first();
+            if ($post==null) {
+                return response($this->result->setError("Not found post!"));
+            }
+            // Get date
+            $date = $this->getDatetimeVietNamNow();
+            // Create Post Comment Rating
+            DB::table('post_comment_ratings')
+                ->insert([
+                    'text_content' => $request->text_content,
+                    'star_rating' => $request->star_rating,
+                    'post_id' => $request->post_id,
+                    'author_id' => $request->user()->id,
+                    'created_at' => $date,
+                    'updated_at' => $date,
+                ]);
+            return response($this->result->setData("Comment successful!"));
+        } catch (Exception $ex) {
+            return response($this->result->setError($ex->getMessage()));
         }
      }
 
