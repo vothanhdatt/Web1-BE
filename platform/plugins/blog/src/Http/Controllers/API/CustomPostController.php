@@ -87,7 +87,7 @@ class CustomPostController extends Controller
             $posts = Post::select('posts.*', 'members.first_name as authorFirstName', 'members.last_name as authorLastName', 'members.avatar as authorAvatar')
                 ->join('members', 'members.id', '=', 'posts.author_id')
                 ->where('members.id', $member->id)
-                ->orderByDesc('created_at')
+                ->orderByDesc('id')
                 ->get();
             // Get Star Rating and Comment Count
             foreach ($posts as $post) {
@@ -505,16 +505,23 @@ class CustomPostController extends Controller
                 'order_by' => 'required|in:DESC,ASC',
             ]);
             if ($validator->fails()) {
-                return response($this->result->setError('Some Field is not true !!'));
+                return $this->getListPostMember($request);
             }
             $posts = [];
             // Processing date separately and name,created_at separately
             // Processing filter by name,created_at
             if ($request->filter_by != 'date') {
-                $posts = Post::where([
-                    ['author_id', $request->user()->id],
-                    ['author_type', 'like', '%member%']
-                ])
+                $posts = Post::select(
+                    'posts.*',
+                    'members.first_name as authorFirstName',
+                    'members.last_name as authorLastName',
+                    'members.avatar as authorAvatar'
+                )
+                    ->join('members', 'members.id', '=', 'posts.author_id')
+                    ->where([
+                        ['posts.author_id', $request->user()->id],
+                        ['posts.author_type', 'like', '%member%']
+                    ])
                     ->orderBy($request->filter_by, $request->order_by)
                     ->get();
             }
