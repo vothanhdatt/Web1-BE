@@ -233,7 +233,7 @@ class CustomMemberController extends Controller
 
             $posts = Post::where([
                 ['author_id', $member->id],
-                ['status', "published"],
+                ['status', "published", "AND" , "pending"],
             ])->get();
             // Get data
             $member['postTotal'] = count($posts);
