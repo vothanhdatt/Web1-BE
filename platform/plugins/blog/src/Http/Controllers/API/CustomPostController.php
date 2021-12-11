@@ -293,10 +293,7 @@ class CustomPostController extends Controller
 
             // Check image
             $get_image = $request->file('image');
-            $image = null;
-            if (!$get_image) {
-                $image = $post->image;
-            } else {
+            if ($get_image) {
                 // Get file name
                 $get_name_image = $get_image->getClientOriginalName(); // Lay ten hinh (image.cbvcc)
                 $arr = explode('.', $get_name_image);
@@ -344,23 +341,21 @@ class CustomPostController extends Controller
                         $this->createImageBySize($post, $get_image, $image_resize);
                     }
                 }
-
-                $post->name = $request->name;
-                $post->description = $request->description;
-                $post->content = $request->content;
-                $post->save();
-
-                DB::table('post_categories')->where('post_id', $post->id)->delete();
-
-                // Insert data into 'post_categories' table
-                foreach ($newListCategoryId as $categoryId) {
-                    DB::table('post_categories')->insert([
-                        'post_id' => $post->id,
-                        'category_id' => $categoryId
-                    ]);
-                }
             }
+            $post->name = $request->name;
+            $post->description = $request->description;
+            $post->content = $request->content;
+            $post->save();
 
+            DB::table('post_categories')->where('post_id', $post->id)->delete();
+
+            // Insert data into 'post_categories' table
+            foreach ($newListCategoryId as $categoryId) {
+                DB::table('post_categories')->insert([
+                    'post_id' => $post->id,
+                    'category_id' => $categoryId
+                ]);
+            }
             return response($this->result->setData("Update successful!"));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
@@ -642,7 +637,7 @@ class CustomPostController extends Controller
                         "data" => $data
                     ]));
                 }
-                $valueReturn = [];        
+                $valueReturn = [];
                 for ($i = 0; $i < $postCount; $i++) {
                     array_push($valueReturn,$data[$i]);  
                 }
