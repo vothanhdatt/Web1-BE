@@ -87,7 +87,7 @@ class CustomPostController extends Controller
             $posts = Post::select('posts.*', 'members.first_name as authorFirstName', 'members.last_name as authorLastName', 'members.avatar as authorAvatar')
                 ->join('members', 'members.id', '=', 'posts.author_id')
                 ->where('members.id', $member->id)
-                ->orderByDesc('created_at')
+                ->orderByDesc('id')
                 ->get();
             // Get Star Rating and Comment Count
             foreach ($posts as $post) {
@@ -344,23 +344,21 @@ class CustomPostController extends Controller
                         $this->createImageBySize($post, $get_image, $image_resize);
                     }
                 }
-
-                $post->name = $request->name;
-                $post->description = $request->description;
-                $post->content = $request->content;
-                $post->save();
-
-                DB::table('post_categories')->where('post_id', $post->id)->delete();
-
-                // Insert data into 'post_categories' table
-                foreach ($newListCategoryId as $categoryId) {
-                    DB::table('post_categories')->insert([
-                        'post_id' => $post->id,
-                        'category_id' => $categoryId
-                    ]);
-                }
             }
+            $post->name = $request->name;
+            $post->description = $request->description;
+            $post->content = $request->content;
+            $post->save();
 
+            DB::table('post_categories')->where('post_id', $post->id)->delete();
+
+            // Insert data into 'post_categories' table
+            foreach ($newListCategoryId as $categoryId) {
+                DB::table('post_categories')->insert([
+                    'post_id' => $post->id,
+                    'category_id' => $categoryId
+                ]);
+            }
             return response($this->result->setData("Update successful!"));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
@@ -505,16 +503,23 @@ class CustomPostController extends Controller
                 'order_by' => 'required|in:DESC,ASC',
             ]);
             if ($validator->fails()) {
-                return response($this->result->setError('Some Field is not true !!'));
+                return $this->getListPostMember($request);
             }
             $posts = [];
             // Processing date separately and name,created_at separately
             // Processing filter by name,created_at
             if ($request->filter_by != 'date') {
-                $posts = Post::where([
-                    ['author_id', $request->user()->id],
-                    ['author_type', 'like', '%member%']
-                ])
+                $posts = Post::select(
+                    'posts.*',
+                    'members.first_name as authorFirstName',
+                    'members.last_name as authorLastName',
+                    'members.avatar as authorAvatar'
+                )
+                    ->join('members', 'members.id', '=', 'posts.author_id')
+                    ->where([
+                        ['posts.author_id', $request->user()->id],
+                        ['posts.author_type', 'like', '%member%']
+                    ])
                     ->orderBy($request->filter_by, $request->order_by)
                     ->get();
             }
@@ -613,5 +618,40 @@ class CustomPostController extends Controller
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
         }
+    }
+    // List Post By Member LoadMore
+    function listPostByMemberLoadMore(Request $request)
+    {
+        $temp = $this->filterListPostByMember($request)->content();
+        $isJson = json_decode($temp);
+        if ($isJson) {
+            $isSuccess = isset($isJson->isSuccess) ? $isJson->isSuccess : false;
+            if ($isSuccess) {
+                $data = $isJson->data;
+                // Processing load more number
+                $post_in_one = 5;
+                $page = is_numeric($request->load_more_number) ? $request->load_more_number : 1;
+                $page = $page <= 0 ? 1 : $page;
+                $postCount = $post_in_one * $page;
+                $maxPage = ceil(count($data) / $post_in_one);
+                if ($page >= $maxPage) {
+                    return response($this->result->setData((object)[
+                        "maxPage" => $maxPage,
+                        "data" => $data
+                    ]));
+                }
+                $valueReturn = [];
+                for ($i = 0; $i < $postCount; $i++) {
+                    array_push($valueReturn, $data[$i]);
+                }
+                return response($this->result->setData((object)[
+                    "maxPage" => $maxPage,
+                    "data" => $valueReturn
+                ]));
+            } else if (isset($isJson->error)) {
+                return response($this->result->setError($isJson->error));
+            }
+        }
+        return response($this->result->setError("Ops, some thing Wrong"));
     }
 }
