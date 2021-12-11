@@ -422,10 +422,14 @@ class CustomPostController extends Controller
     function getRelatedPost(Request $request)
     {
         try {
-            $post_id = $request->post_id;
-            if(!is_integer($post_id)){
+            $validator = Validator::make($request->all(), [
+                'post_id' => 'integer|required'
+            ]);
+
+            if ($validator->fails()) {
                 return response($this->result->setError('Wrong at Post Id'));
             }
+            $post_id = $request->post_id;
             // Find the post
             $post = Post::where("id", $post_id)
                 ->where('status', 'published')
