@@ -80,19 +80,29 @@ class CustomPostController extends Controller
      *
      * Get all post of member
      */
-    function getAllPost(Request $request)
+    function getListPostMember(Request $request)
     {
         try {
             $member = $request->user();
-            $post = Post::select('posts.*', 'members.first_name as authorFirstName', 'members.last_name as authorLastName', 'members.avatar as authorAvatar')
+            $posts = Post::select('posts.*', 'members.first_name as authorFirstName', 'members.last_name as authorLastName', 'members.avatar as authorAvatar')
                 ->join('members', 'members.id', '=', 'posts.author_id')
                 ->where('members.id', $member->id)
                 ->orderByDesc('created_at')
                 ->get();
-            if ($post == null) {
-                return response($this->result->setError("There are no posts !"));
+            // Get Star Rating and Comment Count
+            foreach ($posts as $post) {
+                $postId = $post->id;
+                // Get Comment And rating of post
+                $post['commentTotal'] = DB::table('post_comment_ratings')->where([
+                    ['post_id', $postId],
+                ])->count();
+                // Get total average star
+                $post['starAverage'] = round(DB::table('post_comment_ratings')->where([
+                    ['post_id', $postId],
+                    ['author_id', '!=', $post->author_id]
+                ])->avg('star_rating'), 2);
             }
-            return response($this->result->setData($post));
+            return response($this->result->setData($posts));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
         }
@@ -543,9 +553,9 @@ class CustomPostController extends Controller
         }
     }
 
-     // getRatingPost
-     function getRatingPost(Request $request)
-     {
+    // getRatingPost
+    function getRatingPost(Request $request)
+    {
         try {
             $validator = Validator::make($request->all(), [
                 'post_id'      => 'required|integer|min:1',
@@ -559,19 +569,20 @@ class CustomPostController extends Controller
                     "post_comment_ratings.*",
                     'members.first_name as members_first_name',
                     'members.last_name as members_last_name',
-                    'members.avatar as authorAvatar')
+                    'members.avatar as authorAvatar'
+                )
                 ->join("members", "members.id", "post_comment_ratings.author_id")
                 ->where('post_comment_ratings.post_id', $request->post_id)
                 ->orderByDesc('post_comment_ratings.id')
                 ->get();
-                return response($this->result->setData($comments));
+            return response($this->result->setData($comments));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
         }
-     }
-     // createRatingPost
-     function createRatingPost(Request $request)
-     {
+    }
+    // createRatingPost
+    function createRatingPost(Request $request)
+    {
         try {
             $validator = Validator::make($request->all(), [
                 'text_content'      => 'required|min:2',
@@ -583,7 +594,7 @@ class CustomPostController extends Controller
                 return response($this->result->setError("Some field not true!"));
             }
             $post = Post::where("id", $request->post_id)->first();
-            if ($post==null) {
+            if ($post == null) {
                 return response($this->result->setError("Not found post!"));
             }
             // Get date
@@ -602,6 +613,5 @@ class CustomPostController extends Controller
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
         }
-     }
-
+    }
 }
