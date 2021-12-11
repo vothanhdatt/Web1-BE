@@ -3,23 +3,22 @@
 namespace Botble\Member\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Botble\Base\Http\Responses\CustomResult;
 use Botble\Blog\Models\Post;
 use Botble\Member\Models\Member;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Mail;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class CustomMemberController extends Controller
 {
     private $result;
     // Construct
-    function __construct()
+    public function __construct()
     {
         $this->result = CustomResult::getInstance();
     }
@@ -29,8 +28,8 @@ class CustomMemberController extends Controller
     {
         try {
             $validator = Validator::make($request->input(), [
-                'email'       => 'required|max:60|min:6|email',
-                'password'    => 'required|max:60|min:6',
+                'email' => 'required|max:60|min:6|email',
+                'password' => 'required|max:60|min:6',
             ]);
             if ($validator->fails()) {
                 return response($this->result->setError('Some field is not true !!'));
@@ -53,7 +52,7 @@ class CustomMemberController extends Controller
     }
 
     /** LOGOUT */
-    function logout(Request $request)
+    public function logout(Request $request)
     {
         $member_id = $request->user()->id;
         // Clear all token
@@ -63,21 +62,20 @@ class CustomMemberController extends Controller
         return response($this->result->setData('Logout successful'));
     }
 
-
     /** MEMBER REGISTER */
     public function register(Request $request)
     {
         try {
             $validator = Validator::make($request->input(), [
-                'first_name'       => 'required|min:2|max:60',
-                'last_name'        => 'required|min:4|max:60',
-                'description'      => 'nullable|max:60',
-                'gender'           => 'required|integer|in:1,2',
-                'email'            => 'required|email|min:6',
-                'password'         => 'required|min:6|max:60',
+                'first_name' => 'required|min:2|max:60',
+                'last_name' => 'required|min:4|max:60',
+                'description' => 'nullable|max:60',
+                'gender' => 'required|integer|in:1,2',
+                'email' => 'required|email|min:6',
+                'password' => 'required|min:6|max:60',
                 'confirm_password' => 'required|min:6|max:60',
-                'dob'              => 'nullable|date',
-                'phone'            => 'required|min:10|numeric',
+                'dob' => 'nullable|date',
+                'phone' => 'required|min:10|numeric',
             ]);
             if ($validator->fails()) {
                 return response($this->result->setError('Some field is not true !!'));
@@ -121,7 +119,7 @@ class CustomMemberController extends Controller
             });
             return response($this->result->setData([
                 'message' => 'Registered successfully! We sent an email to you to verify your account!',
-                'member'  => $member
+                'member' => $member,
             ]));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
@@ -145,12 +143,12 @@ class CustomMemberController extends Controller
             $member->confirmed_at = $date;
             $member->save();
         }
-        $email = $member ? $member->email : NULL;
-        $fullName = $member ? $member->first_name . ' ' . $member->last_name : NULL;
+        $email = $member ? $member->email : null;
+        $fullName = $member ? $member->first_name . ' ' . $member->last_name : null;
         $data = [
             "isSuccess" => $isSuccess,
             "email" => $email,
-            "fullName" => $fullName
+            "fullName" => $fullName,
         ];
         return view('emails.activeAccount', $data);
     }
@@ -160,7 +158,7 @@ class CustomMemberController extends Controller
     {
         try {
             $validator = Validator::make($request->input(), [
-                'email' => 'required|email|min:6'
+                'email' => 'required|email|min:6',
             ]);
 
             if ($validator->fails()) {
@@ -180,7 +178,7 @@ class CustomMemberController extends Controller
             $to_email = $member->email;
             $data = array(
                 "fullName" => $member->first_name . " " . $member->last_name,
-                "code" => $codeReset
+                "code" => $codeReset,
             );
             Mail::send('emails.sendCodeResetPassword', $data, function ($message) use ($to_name, $to_email) {
                 $message->to($to_email)->subject('Forget Password'); //send this mail with subject
@@ -193,13 +191,13 @@ class CustomMemberController extends Controller
     }
 
     /** RESET PASSWORD */
-    function resetPassword(Request $request)
+    public function resetPassword(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'code'              => 'required|min:8',
-                'new_password'      => 'required|min:6|max:60',
-                'confirm_password'  => 'required|min:6|max:60',
+                'code' => 'required|min:8',
+                'new_password' => 'required|min:6|max:60',
+                'confirm_password' => 'required|min:6|max:60',
             ]);
 
             if ($validator->fails()) {
@@ -232,6 +230,33 @@ class CustomMemberController extends Controller
     {
         try {
             $member = $request->user();
+
+            $posts = Post::where([
+                ['author_id', $member->id],
+                ['status', "published"],
+            ])->get();
+            // Get data
+            $member['postTotal'] = count($posts);
+            $starTotal = 0;
+            $commentTotal = 0;
+            foreach ($posts as $post) {
+                // Get star rating average
+                $temp = DB::table('post_comment_ratings')->where([
+                    ['post_id', $post->id],
+                    ['author_id', '!=', $member->id],
+                ])->avg('star_rating');
+                $temp = $temp ? $temp : 0;
+                $starTotal += $temp;
+                // Get comment total
+                $temp = DB::table('post_comment_ratings')->where([
+                    ['post_id', $post->id],
+                    ['author_id', '!=', $member->id],
+                ])->count();
+                $commentTotal += $temp;
+            }
+            // Get data
+            $member['starAvg'] = count($posts) == 0 ? 0 : round($starTotal / count($posts), 2);
+            $member['commentTotal'] = $commentTotal;
             return response($this->result->setData($member));
         } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
@@ -274,11 +299,11 @@ class CustomMemberController extends Controller
     {
         try {
             $validator = Validator::make($request->input(), [
-                'first_name'  => 'required|max:120|min:2',
-                'last_name'   => 'required|max:120|min:2',
-                'phone'       => 'required|max:15|min:8',
-                'dob'         => 'required|date',
-                'gender'      => 'required|integer|in:1,2',
+                'first_name' => 'required|max:120|min:2',
+                'last_name' => 'required|max:120|min:2',
+                'phone' => 'required|max:15|min:8',
+                'dob' => 'required|date',
+                'gender' => 'required|integer|in:1,2',
                 'description' => 'nullable',
             ]);
 
@@ -307,12 +332,13 @@ class CustomMemberController extends Controller
     }
 
     /** UPDATE MEMBER PASSWORD */
-    public function updateMemberPassword(Request $request){
+    public function updateMemberPassword(Request $request)
+    {
         try {
             $validator = Validator::make($request->input(), [
-                'old_password'  => 'required|max:60|min:6',
-                'new_password'  => 'required|max:60|min:6',
-                'confirm_new_password'  => 'required|max:60|min:6'
+                'old_password' => 'required|max:60|min:6',
+                'new_password' => 'required|max:60|min:6',
+                'confirm_new_password' => 'required|max:60|min:6',
             ]);
 
             if ($validator->fails()) {
@@ -322,7 +348,7 @@ class CustomMemberController extends Controller
                 return response($this->result->setError('Wrong at confirm password !!'));
             }
             $member = $request->user();
-            if (!password_verify($request->old_password, $member->password)){
+            if (!password_verify($request->old_password, $member->password)) {
                 return response($this->result->setError('Wrong at old password !!'));
             }
             // Update password
@@ -335,7 +361,6 @@ class CustomMemberController extends Controller
         }
     }
 
-
     // Get datetime Viet Nam Now
     private function getDatetimeVietNamNow()
     {
@@ -344,7 +369,7 @@ class CustomMemberController extends Controller
         return date('Y/m/d H:i:s', time());
     }
     //Get URL Sever
-    function get_url_sever()
+    public function get_url_sever()
     {
         $server_name = $_SERVER['SERVER_NAME'];
 
@@ -363,27 +388,27 @@ class CustomMemberController extends Controller
     }
 
     /** Web 2 Start Here */
-    function getMembersHighlight()
+    public function getMembersHighlight()
     {
-        try{
+        try {
             $author_ids = Post::select(DB::raw('`author_id`,COUNT(`author_id`) as posts_number'))
-            ->where('author_type', 'like', '%Member%')
-            ->where('status', 'published')
-            ->groupBy('author_id')
-            ->orderByDesc(DB::raw('COUNT(`author_id`)'))
-            ->limit(5)
-            ->get();
-        $topMembers = array();
-        foreach ($author_ids as $author_id) {
-            $user_info = Member::where('id', $author_id->author_id)->first();
-            if ($user_info) {
-                $user_info['posts_number'] = $author_id->posts_number;
-                array_push($topMembers, $user_info);
+                ->where('author_type', 'like', '%Member%')
+                ->where('status', 'published')
+                ->groupBy('author_id')
+                ->orderByDesc(DB::raw('COUNT(`author_id`)'))
+                ->limit(5)
+                ->get();
+            $topMembers = array();
+            foreach ($author_ids as $author_id) {
+                $user_info = Member::where('id', $author_id->author_id)->first();
+                if ($user_info) {
+                    $user_info['posts_number'] = $author_id->posts_number;
+                    array_push($topMembers, $user_info);
+                }
             }
-        }
 
             return response($this->result->setData($topMembers));
-        }catch(Exception $ex){
+        } catch (Exception $ex) {
             return response($this->result->setError($ex->getMessage()));
         }
     }
