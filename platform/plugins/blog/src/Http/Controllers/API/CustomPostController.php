@@ -293,10 +293,7 @@ class CustomPostController extends Controller
 
             // Check image
             $get_image = $request->file('image');
-            $image = null;
-            if (!$get_image) {
-                $image = $post->image;
-            } else {
+            if ($get_image) {
                 // Get file name
                 $get_name_image = $get_image->getClientOriginalName(); // Lay ten hinh (image.cbvcc)
                 $arr = explode('.', $get_name_image);
