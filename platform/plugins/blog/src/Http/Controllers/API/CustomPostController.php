@@ -485,7 +485,7 @@ class CustomPostController extends Controller
             return response($this->result->setError($ex->getMessage()));
         }
     }
-    // Filter Post 
+    // Filter Post
     function filterListPostByMember(Request $request)
     {
         try {
@@ -511,7 +511,7 @@ class CustomPostController extends Controller
             // Processing filter by date
             else {
                 $date = $request->time;
-                // Check time request 
+                // Check time request
                 if ((bool)preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/', $date)) {
                     $posts = Post::where([
                         ['author_id', $request->user()->id],
@@ -542,4 +542,32 @@ class CustomPostController extends Controller
             return response($this->result->serError($ex));
         }
     }
+
+     // getRatingPost
+     function getRatingPost(Request $request)
+     {
+        try {
+            $validator = Validator::make($request->all(), [
+                'post_id'      => 'required|integer|min:1',
+            ]);
+
+            if ($validator->fails()) {
+                return response($this->result->setError("Post Id not valid !"));
+            }
+            $comments = DB::table('post_comment_ratings')
+                ->select(
+                    "post_comment_ratings.*",
+                    'members.first_name as members_first_name',
+                    'members.last_name as members_last_name',
+                    'members.avatar as authorAvatar')
+                ->join("members", "members.id", "post_comment_ratings.author_id")
+                ->where('post_comment_ratings.post_id', $request->post_id)
+                ->orderByDesc('post_comment_ratings.id')
+                ->get();
+                return response($this->result->setData($comments));
+        } catch (Exception $ex) {
+            return response($this->result->serError($ex));
+        }
+     }
+
 }

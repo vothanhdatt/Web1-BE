@@ -57,9 +57,13 @@ Route::group([
      */
     // Related post
     Route::get('get-related-post', 'CustomPostController@getRelatedPost');
+    // get Rating Post
+    Route::get('get-rating-post', 'CustomPostController@getRatingPost');
     // Api need Login
     Route::group(['middleware' => ['auth:member-api']], function () {
         // List Post By Member (With Filter)
         Route::get('get-list-post-member-filter', 'CustomPostController@filterListPostByMember');
     });
+
+
 });
