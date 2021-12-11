@@ -43,7 +43,7 @@ Route::group([
     Route::group(['middleware' => ['auth:member-api']], function () {
 
         // Get all post
-        Route::get('get-all-post', 'CustomPostController@getAllPost');
+        Route::get('get-list-post-member', 'CustomPostController@getListPostMember');
         // Create post
         Route::post('create-post', 'CustomPostController@createPost');
         // Update post
@@ -57,9 +57,16 @@ Route::group([
      */
     // Related post
     Route::get('get-related-post', 'CustomPostController@getRelatedPost');
+    // get Rating Post
+    Route::get('get-rating-post', 'CustomPostController@getRatingPost');
+
     // Api need Login
     Route::group(['middleware' => ['auth:member-api']], function () {
         // List Post By Member (With Filter)
         Route::get('get-list-post-member-filter', 'CustomPostController@filterListPostByMember');
+        // create Rating Post
+        Route::post('create-rating-post', 'CustomPostController@createRatingPost');
     });
+
+
 });
