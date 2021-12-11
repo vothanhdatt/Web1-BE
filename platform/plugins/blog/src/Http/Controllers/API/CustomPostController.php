@@ -621,4 +621,39 @@ class CustomPostController extends Controller
             return response($this->result->setError($ex->getMessage()));
         }
     }
+    // List Post By Member LoadMore
+    function listPostByMemberLoadMore(Request $request)
+    {
+        $temp = $this->filterListPostByMember($request)->content();
+        $isJson = json_decode($temp);
+        if ($isJson) {
+            $isSuccess = isset($isJson->isSuccess) ? $isJson->isSuccess : false;
+            if ($isSuccess) {
+                $data = $isJson->data;
+                // Processing load more number
+                $post_in_one = 5;
+                $page = is_numeric($request->load_more_number) ? $request->load_more_number : 1;
+                $page = $page <= 0 ? 1 : $page;
+                $postCount = $post_in_one * $page;
+                $maxPage = ceil(count($data) / $post_in_one);
+                if ($page >= $maxPage) {
+                    return response($this->result->setData((object)[
+                        "maxPage" => $maxPage,
+                        "data" => $data
+                    ]));
+                }
+                $valueReturn = [];        
+                for ($i = 0; $i < $postCount; $i++) {
+                    array_push($valueReturn,$data[$i]);  
+                }
+                return response($this->result->setData((object)[
+                    "maxPage" => $maxPage,
+                    "data" => $valueReturn
+                ]));
+            } else if (isset($isJson->error)) {
+                return response($this->result->setError($isJson->error));
+            }
+        }
+        return response($this->result->setError("Ops, some thing Wrong"));
+    }
 }

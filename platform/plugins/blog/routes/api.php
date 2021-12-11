@@ -66,7 +66,7 @@ Route::group([
         Route::get('get-list-post-member-filter', 'CustomPostController@filterListPostByMember');
         // create Rating Post
         Route::post('create-rating-post', 'CustomPostController@createRatingPost');
+        // List Post By Member (With LoadMore)
+        Route::get('get-list-post-member-load-more', 'CustomPostController@listPostByMemberLoadMore');
     });
-
-
 });
