@@ -538,18 +538,21 @@ class LeHieu_CustomPostControllerTest extends TestCase
     public function testGetRatingPostOk()
     {
         $request = new Request();
-        $request->post_id = "1";
+        $request->post_id = 1;
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
         $check = true;
         if ($json) {
-            $check =
             isset($json->isSuccess) &&
-            $json->isSuccess == false &&
-            $json->data == null &&
+            $json->isSuccess == true &&
+            isset($json->data) &&
+            is_array($json->data) &&
+            isset($json->data[0]) &&
+            isset($json->data[0]->id) &&
+            is_numeric($json->data[0]->id) &&
             isset($json->error) &&
-            $json->error == "Post Id not valid !";
+            $json->error == NULL;
         }
         $this->assertTrue($check);
     }
@@ -559,11 +562,11 @@ class LeHieu_CustomPostControllerTest extends TestCase
     public function testGetRatingPostNg()
     {
         $request = new Request();
-        $request->post_id = "-1";
+        $request->post_id = -1;
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
-        $check = true;
+        $check = false;
         if ($json) {
             $check =
             isset($json->isSuccess) &&
@@ -584,7 +587,7 @@ class LeHieu_CustomPostControllerTest extends TestCase
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
-        $check = true;
+        $check = false;
         if ($json) {
             $check =
             isset($json->isSuccess) &&
@@ -605,7 +608,7 @@ class LeHieu_CustomPostControllerTest extends TestCase
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
-        $check = true;
+        $check = false;
         if ($json) {
             $check =
             isset($json->isSuccess) &&
@@ -626,7 +629,7 @@ class LeHieu_CustomPostControllerTest extends TestCase
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
-        $check = true;
+        $check = false;
         if ($json) {
             $check =
             isset($json->isSuccess) &&
@@ -647,7 +650,7 @@ class LeHieu_CustomPostControllerTest extends TestCase
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
-        $check = true;
+        $check = false;
         if ($json) {
             $check =
             isset($json->isSuccess) &&
@@ -668,7 +671,7 @@ class LeHieu_CustomPostControllerTest extends TestCase
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
-        $check = true;
+        $check = false;
         if ($json) {
             $check =
             isset($json->isSuccess) &&
@@ -689,7 +692,7 @@ class LeHieu_CustomPostControllerTest extends TestCase
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
-        $check = true;
+        $check = false;
         if ($json) {
             $check =
             isset($json->isSuccess) &&
@@ -710,7 +713,7 @@ class LeHieu_CustomPostControllerTest extends TestCase
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
-        $check = true;
+        $check = false;
         if ($json) {
             $check =
             isset($json->isSuccess) &&
@@ -731,7 +734,7 @@ class LeHieu_CustomPostControllerTest extends TestCase
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
-        $check = true;
+        $check = false;
         if ($json) {
             $check =
             isset($json->isSuccess) &&
@@ -752,7 +755,7 @@ class LeHieu_CustomPostControllerTest extends TestCase
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
-        $check = true;
+        $check = false;
         if ($json) {
             $check =
             isset($json->isSuccess) &&
@@ -773,7 +776,7 @@ class LeHieu_CustomPostControllerTest extends TestCase
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
-        $check = true;
+        $check = false;
         if ($json) {
             $check =
             isset($json->isSuccess) &&
@@ -794,7 +797,7 @@ class LeHieu_CustomPostControllerTest extends TestCase
         $postController = new CustomPostController();
         $relatedPost = $postController->getRatingPost($request)->content();
         $json = json_decode($relatedPost);
-        $check = true;
+        $check = false;
         if ($json) {
             $check =
             isset($json->isSuccess) &&
