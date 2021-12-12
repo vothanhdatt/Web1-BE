@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Botble\Blog\Http\Controllers\API\CustomPostController;
 use Illuminate\Http\Request;
+use PhpParser\Node\Expr\Empty_;
 use Tests\TestCase;
 
 class LeHieu_CustomPostControllerTest extends TestCase
@@ -527,6 +528,280 @@ class LeHieu_CustomPostControllerTest extends TestCase
             $json->data == null &&
             isset($json->error) &&
             $json->error == "There are no posts !";
+        }
+        $this->assertTrue($check);
+    }
+
+    /**
+     * Test get Rating Post Ok
+     */
+    public function testGetRatingPostOk()
+    {
+        $request = new Request();
+        $request->post_id = "1";
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test get Rating Post Ng
+     */
+    public function testGetRatingPostNg()
+    {
+        $request = new Request();
+        $request->post_id = "-1";
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test get Rating Post Null
+     */
+    public function testGetRatingPostNull()
+    {
+        $request = new Request();
+        $request->post_id = null;
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test get Rating Post Float
+     */
+    public function testGetRatingPostFloat()
+    {
+        $request = new Request();
+        $request->post_id = 1.2;
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test get Rating Post Negative
+     */
+    public function testGetRatingPostNegative()
+    {
+        $request = new Request();
+        $request->post_id = -5;
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test get Rating Post Array null
+     */
+    public function testGetRatingPostArrayNull()
+    {
+        $request = new Request();
+        $request->post_id = [];
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test get Rating Post Array
+     */
+    public function testGetRatingPostArray()
+    {
+        $request = new Request();
+        $request->post_id = [1,2,3];
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test get Rating Post String
+     */
+    public function testGetRatingPostString()
+    {
+        $request = new Request();
+        $request->post_id = "ab%";
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test get Rating Post Object
+     */
+    public function testGetRatingPostObject()
+    {
+        $request = new Request();
+        $request->post_id = new Request();
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test get Rating Post No Value
+     */
+    public function testGetRatingPostNoValue()
+    {
+        $request = new Request();
+        $request->post_id;
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test get Rating Post Not valid
+     */
+    public function testGetRatingPostNotValid()
+    {
+        $request = new Request();
+        $request->post_id = 9999999;
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
+        }
+        $this->assertTrue($check);
+    }
+     /**
+     * Test get Rating Post Bool true
+     */
+    public function testGetRatingPostBoolTrue()
+    {
+        $request = new Request();
+        $request->post_id = true;
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test get Rating Post Bool false
+     */
+    public function testGetRatingPostBoolFalse()
+    {
+        $request = new Request();
+        $request->post_id = false;
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getRatingPost($request)->content();
+        $json = json_decode($relatedPost);
+        $check = true;
+        if ($json) {
+            $check =
+            isset($json->isSuccess) &&
+            $json->isSuccess == false &&
+            $json->data == null &&
+            isset($json->error) &&
+            $json->error == "Post Id not valid !";
         }
         $this->assertTrue($check);
     }
