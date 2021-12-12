@@ -23,14 +23,11 @@ class HieuCao_CustomPostControllerTest extends TestCase
         $check = false;
         if ($json) {
             $check =
-                isset($json->isSuccess) &&
                 $json->isSuccess == true &&
-                isset($json->data) &&
                 is_array($json->data) &&
                 isset($json->data[0]) &&
                 isset($json->data[0]->id) &&
                 is_numeric($json->data[0]->id) &&
-                isset($json->error) &&
                 $json->error == NULL;
         }
         $this->assertTrue($check);
@@ -221,6 +218,193 @@ class HieuCao_CustomPostControllerTest extends TestCase
                 $json->data == NULL &&
                 isset($json->error) &&
                 $json->error == 'Wrong at Post Id';
+        }
+        $this->assertTrue($check);
+    }
+
+     /**
+     * Test getListPostMember ok
+     */
+    public function testGetListPostMemberOk()
+    {
+        $request = new Request();
+        $request->id_member_test = 21;
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getListPostMember($request)->content();
+        $json = json_decode($relatedPost);
+        $check = false;
+        if ($json) {
+            $check =
+                isset($json->isSuccess) &&
+                $json->isSuccess == true &&
+                isset($json->data) &&
+                is_array($json->data) &&
+                count($json->data) > 0 &&
+                !$json->error;
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test getListPostMember with id integer not exist
+     */
+    public function testGetListPostMemberWithIdIntegerNotExist()
+    {
+        $request = new Request();
+        $request->id_member_test = 9999;
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getListPostMember($request)->content();
+        $json = json_decode($relatedPost);
+        $check = false;
+        if ($json) {
+            $check =
+                isset($json->isSuccess) &&
+                $json->isSuccess == true &&
+                isset($json->data) &&
+                is_array($json->data) &&
+                empty($json->data) &&
+                !$json->error;
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test getListPostMember with id float
+     */
+    public function testGetListPostMemberWithIdFloat()
+    {
+        $request = new Request();
+        $request->id_member_test = 1.23;
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getListPostMember($request)->content();
+        $json = json_decode($relatedPost);
+        $check = false;
+        if ($json) {
+            $check =
+                isset($json->isSuccess) &&
+                $json->isSuccess == true &&
+                isset($json->data) &&
+                is_array($json->data) &&
+                empty($json->data) &&
+                !$json->error;
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test getListPostMember With id String
+     */
+    public function testGetListPostMemberWithIdString()
+    {
+        $request = new Request();
+        $request->id_member_test ='This is string';
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getListPostMember($request)->content();
+        $json = json_decode($relatedPost);
+        $check = false;
+        if ($json) {
+            $check =
+                $json->isSuccess == false &&
+                is_null($json->data) &&
+                isset($json->error) &&
+                $json->error == "Wrong at user_id !!";
+        }
+        $this->assertTrue($check);
+    }
+     /**
+     * Test getListPostMember With id Object
+     */
+    public function testGetListPostMemberWithIdObject()
+    {
+        $request = new Request();
+        $request->id_member_test = new CustomResult();
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getListPostMember($request)->content();
+        $json = json_decode($relatedPost);
+        $check = false;
+        if ($json) {
+            $check =
+                $json->isSuccess == false &&
+                is_null($json->data) &&
+                isset($json->error) &&
+                $json->error == "Wrong at user_id !!";
+        }
+        $this->assertTrue($check);
+    }
+     /**
+     * Test getListPostMember With id true
+     */
+    public function testGetListPostMemberWithIdTrue()
+    {
+        $request = new Request();
+        $request->id_member_test = true;
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getListPostMember($request)->content();
+        $json = json_decode($relatedPost);
+        $check = false;
+        if ($json) {
+            $check =
+                $json->isSuccess == false &&
+                is_null($json->data) &&
+                isset($json->error) &&
+                $json->error == "Wrong at user_id !!";
+        }
+        $this->assertTrue($check);
+    }
+     /**
+     * Test getListPostMember With id false
+     */
+    public function testGetListPostMemberWithIdFalse()
+    {
+        $request = new Request();
+        $request->id_member_test = false;
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getListPostMember($request)->content();
+        $json = json_decode($relatedPost);
+        $check = false;
+        if ($json) {
+            $check =
+                $json->isSuccess == false &&
+                is_null($json->data) &&
+                isset($json->error) &&
+                $json->error == "Wrong at user_id !!";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test getListPostMember With id empty array
+     */
+    public function testGetListPostMemberWithIdEmptyArray()
+    {
+        $request = new Request();
+        $request->id_member_test = [];
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getListPostMember($request)->content();
+        $json = json_decode($relatedPost);
+        $check = false;
+        if ($json) {
+            $check =
+                $json->isSuccess == false &&
+                is_null($json->data) &&
+                isset($json->error) &&
+                $json->error == "Wrong at user_id !!";
+        }
+        $this->assertTrue($check);
+    }
+    /**
+     * Test getListPostMember With id array
+     */
+    public function testGetListPostMemberWithIdArray()
+    {
+        $request = new Request();
+        $request->id_member_test = [1,2,3];
+        $postController = new CustomPostController();
+        $relatedPost = $postController->getListPostMember($request)->content();
+        $json = json_decode($relatedPost);
+        $check = false;
+        if ($json) {
+            $check =
+                $json->isSuccess == false &&
+                is_null($json->data) &&
+                isset($json->error) &&
+                $json->error == "Wrong at user_id !!";
         }
         $this->assertTrue($check);
     }

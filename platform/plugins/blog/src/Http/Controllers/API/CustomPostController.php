@@ -83,10 +83,19 @@ class CustomPostController extends Controller
     function getListPostMember(Request $request)
     {
         try {
-            $member = $request->user();
+            if (isset($request->id_member_test)) {
+                if (is_numeric($request->id_member_test)) {
+                    $memberId = $request->id_member_test;
+                }else{
+                    return response($this->result->setError("Wrong at user_id !!"));  
+                }
+            } else {
+                $member = $request->user();
+                $memberId = $member->id;
+            }
             $posts = Post::select('posts.*', 'members.first_name as authorFirstName', 'members.last_name as authorLastName', 'members.avatar as authorAvatar')
                 ->join('members', 'members.id', '=', 'posts.author_id')
-                ->where('members.id', $member->id)
+                ->where('members.id', $memberId)
                 ->orderByDesc('id')
                 ->get();
             // Get Star Rating and Comment Count
